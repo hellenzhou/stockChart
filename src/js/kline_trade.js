@@ -1,4 +1,4 @@
-import {ChartManager} from './chart_manager'
+import { ChartManager } from './chart_manager'
 
 export class KlineTrade {
 
@@ -48,8 +48,9 @@ export class KlineTrade {
                 let dateStr = this.dateFormatTf(this.tradeDate.getHours())
                     + ":" + this.dateFormatTf(this.tradeDate.getMinutes())
                     + ":" + this.dateFormatTf(this.tradeDate.getSeconds());
-                let arr = (item.amount.toFixed(4) + "").split(".");
-                let price = item.price;
+
+                let arr = (Number(item.amount).toFixed(4) + "").split(".");
+                let price = Number(item.price);
                 if (price > 1) {
                     price = price.toFixed(2)
                 }

@@ -720,6 +720,7 @@ export class Control {
         showIndicNW += dropDownSettingsW;
         showToolsNW += dropDownSettingsW;
         selectThemeNW += dropDownSettingsW;
+
         if (chartWidth < periodsHorzNW) {
             domElemCache.append(periodsHorz);
         } else {
@@ -746,6 +747,11 @@ export class Control {
             dropDownSettings.before(selectTheme);
             rowTheme.style.display = "none";
         }
+
+
+        // $('#chart_show_indicator').hide();
+        // $('#chart_show_tools').hide();
+        // $('#chart_toolbar_theme').hide();
 
         ChartManager.instance.redraw('All', true);
         Kline.instance.onResize(width, height);

@@ -1,19 +1,19 @@
-import {ChartManager} from './chart_manager'
-import {ChartSettings} from './chart_settings'
+import { ChartManager } from './chart_manager'
+import { ChartSettings } from './chart_settings'
 import * as data_sources from './data_sources'
 import * as data_providers from './data_providers'
 import * as areas from './areas'
 import * as plotters from './plotters'
-import {Timeline} from './timeline'
-import {CName} from './cname'
+import { Timeline } from './timeline'
+import { CName } from './cname'
 import * as layouts from './layouts'
 import * as themes from './themes'
 import * as ranges from './ranges'
 
 export class Template {
 
-    static displayVolume = true;
-
+    // static displayVolume = true;
+    static displayVolume = false;
     static createCandlestickDataSource(dsAlias) {
         return new data_sources.MainDataSource(dsAlias);
     }

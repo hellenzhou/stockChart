@@ -119,7 +119,7 @@ export default class Kline {
         this.periodTitle = null;
         this.periodAreaRanages = null;
         this.deviceRatio = 2;
-        this.bottomShowTrade = fase;
+        this.bottomShowTrade = false;
         
         Object.assign(this, option);
 

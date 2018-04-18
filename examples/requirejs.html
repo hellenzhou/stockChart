@@ -19,12 +19,8 @@
 <body>
 
     <div class="kline">
-
-        <h1>K线图</h1>
-
         <div id="kline_container"></div>
     </div>
-
 
     <script type="text/javascript">
 
@@ -49,7 +45,6 @@
         require(['kline'], function () {
             let w = window.innerWidth;
             let h = window.innerHeight;
-
             var kline = new Kline({
                 element: "#kline_container",
                 width: w,
@@ -69,7 +64,6 @@
                 klineMarketName: 'market',
                 klineTypeName: 'type',
                 klineSizeName: 'size',
-                
             });
 
             kline.draw();
