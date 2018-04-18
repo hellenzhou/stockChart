@@ -1,29 +1,20 @@
 <!DOCTYPE html>
 <html>
-
 <head>
     <title>K线图</title>
     <link href="/src/css/main.css" rel="stylesheet" />
     <script src="../lib/require.js"></script>
+    <meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,minimum-scale=1.0,user-scalable=0">
     <style type="text/css">
-        .kline {
-            width: 1200px;
-            margin-left: auto;
-            margin-right: auto;
-            height: 462px;
-            position: relative;
-        }
     </style>
 </head>
 
 <body>
-
     <div class="kline">
         <div id="kline_container"></div>
     </div>
 
     <script type="text/javascript">
-
         require.config({
             paths: {
                 "jquery": "../lib/jquery",
@@ -51,6 +42,8 @@
                 height: h,
                 theme: 'dark', // light/dark
                 language: 'zh-cn', // zh-cn/en-us/zh-tw
+                showLanguageSelect: false,
+                showDrawTool: false,
                 ranges: ["line", "1m", "1d", "5m", "15m", "30m", "1h", "4h", "12h", "1w"],
                 symbol: "btc_usdt",
                 symbolName: "BTC/USD",

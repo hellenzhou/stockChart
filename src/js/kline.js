@@ -114,13 +114,15 @@ export default class Kline {
         this.depthTimer = null;
         this.depthIntervalTime = 8000;
 
-    
+
         this.chatPeriodToolRanages = [];
         this.periodTitle = null;
         this.periodAreaRanages = null;
         this.deviceRatio = 2;
         this.bottomShowTrade = false;
-        
+        this.showLanguageSelect = false;
+        this.showDrawTool = false;
+
         Object.assign(this, option);
 
         if (!Kline.created) {
@@ -525,6 +527,102 @@ export default class Kline {
                 }
                 ChartManager.instance.redraw('OverlayCanvas', false);
             });
+
+             // 支持移动mobile触摸屏
+             let chart_overlayCanvas = document.getElementById('chart_overlayCanvas');
+             chart_overlayCanvas.ontouchstart = function (e) {
+                 Kline.instance.buttonDown = true;
+                 let r = e.target.getBoundingClientRect();
+                 let x = e.touches[0].clientX - r.left;
+                 let y = e.touches[0].clientY - r.top;
+                 ChartManager.instance.onMouseDown("frame0", x, y);
+             }
+ 
+             chart_overlayCanvas.ontouchmove = function (e) {
+                 let r = e.target.getBoundingClientRect();
+                 let x = e.changedTouches[0].clientX - r.left;
+                 let y = e.changedTouches[0].clientY - r.top;
+                 let mgr = ChartManager.instance;
+                 if (Kline.instance.buttonDown === true) {
+                     mgr.onMouseMove("frame0", x, y, true);
+                     mgr.redraw("All", false);
+                 } else {
+                     mgr.onMouseMove("frame0", x, y, false);
+                     mgr.redraw("OverlayCanvas");
+                 }
+             }
+
+             chart_overlayCanvas.ontouchend = function (e) {
+                Kline.instance.buttonDown = false;
+                let r = e.target.getBoundingClientRect();
+                let x = e.changedTouches[0].clientX - r.left;
+                let y = e.changedTouches[0].clientY - r.top;
+                let mgr = ChartManager.instance;
+                mgr.onMouseUp("frame0", x, y);
+                mgr.redraw("All");
+            }
+
+            chart_overlayCanvas.ontouchcancel = function (e) {
+                let r = e.target.getBoundingClientRect();
+                let x = e.clientX - r.left;
+                let y = e.clientY - r.top;
+                let mgr = ChartManager.instance;
+                mgr.onMouseLeave("frame0", x, y, false);
+                mgr.redraw("OverlayCanvas");
+            }
+            $("#chart_overlayCanvas")
+            .mousemove(function (e) {
+
+                let r = e.target.getBoundingClientRect();
+                let x = e.clientX - r.left;
+                let y = e.clientY - r.top;
+                let mgr = ChartManager.instance;
+                let ratio = Kline.instance.deviceRatio;
+                if (Kline.instance.buttonDown === true) {
+                    mgr.onMouseMove("frame0", x * ratio, y * ratio, true);
+                    mgr.redraw("All", false);
+                } else {
+                    mgr.onMouseMove("frame0", x * ratio, y * ratio, false);
+                    mgr.redraw("OverlayCanvas");
+                }
+            })
+            .mouseleave(function (e) {
+                let r = e.target.getBoundingClientRect();
+                let x = e.clientX - r.left;
+                let y = e.clientY - r.top;
+                let mgr = ChartManager.instance;
+                let ratio = Kline.instance.deviceRatio;
+                mgr.onMouseLeave("frame0", x * ratio, y * ratio, false);
+                mgr.redraw("OverlayCanvas");
+            })
+            .mouseup(function (e) {
+                if (e.which !== 1) {
+                    return;
+                }
+                Kline.instance.buttonDown = false;
+                let r = e.target.getBoundingClientRect();
+                let x = e.clientX - r.left;
+                let y = e.clientY - r.top;
+                let mgr = ChartManager.instance;
+                let ratio = Kline.instance.deviceRatio;
+                mgr.onMouseUp("frame0", x * ratio, y * ratio);
+                mgr.redraw("All");
+            })
+            .mousedown(function (e) {
+                if (e.which !== 1) {
+                    ChartManager.instance.deleteToolObject();
+                    ChartManager.instance.redraw('OverlayCanvas', false);
+                    return;
+                }
+                Kline.instance.buttonDown = true;
+                let r = e.target.getBoundingClientRect();
+                let x = e.clientX - r.left;
+                let y = e.clientY - r.top;
+                let ratio = Kline.instance.deviceRatio;
+                ChartManager.instance.onMouseDown("frame0", x * ratio, y * ratio);
+            });
+
+            /*
             $("#chart_overlayCanvas")
                 .mousemove(function (e) {
                     let r = e.target.getBoundingClientRect();
@@ -571,7 +669,8 @@ export default class Kline {
                     let y = e.clientY - r.top;
                     ChartManager.instance.onMouseDown("frame0", x, y);
                 });
-            $("#chart_parameter_settings :input").change(function () {
+           */
+           $("#chart_parameter_settings :input").change(function () {
                 let name = $(this).attr("name");
                 let index = 0;
                 let valueArray = [];
@@ -625,7 +724,7 @@ export default class Kline {
             });
 
 
-            $('body').on('click', '#sizeIcon', function () {
+            $("#kline_container").on('click', '#sizeIcon', function () {
                 Kline.instance.isSized = !Kline.instance.isSized;
                 if (Kline.instance.isSized) {
                     $(Kline.instance.element).css({
@@ -651,6 +750,14 @@ export default class Kline {
                 }
             });
 
+            $("#kline_container").on('click', '#tabList li', function (element) {
+                var currentTarget = $(element.currentTarget),
+                    showTabContent = currentTarget.data().show;
+                $("#" + showTabContent).show();
+                $("#" + showTabContent).siblings("div").hide();
+                currentTarget.addClass("current");
+                currentTarget.siblings().removeClass("current");
+            });
         })
 
     }

@@ -2178,7 +2178,9 @@ export class DrawPriceLinesPlotter extends CToolPlotter {
     }
 
     draw(context) {
-        context.font = "12px Tahoma";
+        let devicePixelRatio = window.devicePixelRatio;
+        let size =  10 * devicePixelRatio;
+        context.font = size + "px Tahoma";
         context.textAlign = "left";
         context.fillStyle = this.theme.getColor(themes.Theme.Color.LineColorNormal);
         this.updateCtrlPtPos();
@@ -2322,7 +2324,10 @@ export class BandLinesPlotter extends CToolPlotter {
     }
 
     drawLinesAndInfo(context, startPoint, endPoint) {
-        context.font = "12px Tahoma";
+        let devicePixelRatio = window.devicePixelRatio;
+        let size =  10 * devicePixelRatio;
+        context.font = size + "px Tahoma";
+
         context.textAlign = "left";
         context.fillStyle = this.theme.getColor(themes.Theme.Color.LineColorNormal);
         let text;

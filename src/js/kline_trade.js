@@ -44,7 +44,8 @@ export class KlineTrade {
         for (let i = 0; i < array.length; i++) {
             let item = array[i];
             if (i >= array.length - this.tradesLimit) {
-                this.tradeDate.setTime(item.time);
+                //modify
+                this.tradeDate.setTime(item.date * 1000);
                 let dateStr = this.dateFormatTf(this.tradeDate.getHours())
                     + ":" + this.dateFormatTf(this.tradeDate.getMinutes())
                     + ":" + this.dateFormatTf(this.tradeDate.getSeconds());
@@ -118,9 +119,10 @@ export class KlineTrade {
             $trades.append(totalUls);
         }
         totalUls = null;
-        $trades.find("ul.newul").slideDown(1000, function () {
-            $(this).removeClass("newul");
-        });
+        //modify
+        // $trades.find("ul.newul").slideDown(1000, function () {
+        //     $(this).removeClass("newul");
+        // });
         $trades.find("ul:gt(" + (this.tradesLimit - 1) + ")").remove();
     }
 

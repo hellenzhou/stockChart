@@ -1,4 +1,5 @@
-<div class="trade_container dark hide">
+
+<!-- <div class="trade_container dark hide">
     <div class="m_cent">
         <div class="m_guadan">
             <div class="symbol-title">
@@ -24,8 +25,28 @@
             </div>
         </div>
     </div>
-</div>
+</div> -->
 
+<div id="chart_container_fullscreen" style="display: none">
+    </div>
+    
+    <div class="chart_trade_quotation">
+        <ul id="chart_trade_quotation_content">
+            <li>
+                <div class="symbol-title">
+                    <a class="white"></a>
+                </div>
+            </li>
+            <li>
+                <div id="price" class="green"></div>
+            </li>
+            <li>=444444CNY +4.53%</li>
+            <li>高 7497.85</li>
+            <li>低 6519.83</li>
+            <!-- <li>24H 2567.8</li> -->
+        </ul>
+    </div>
+ 
 <div class="chart_container dark">
     <div id="chart_dom_elem_cache"></div>
     <!-- ToolBar -->
@@ -685,6 +706,36 @@
 
     <!-- Loading -->
     <div id="chart_loading" class="chart_str_loading">正在读取数据...</div>
+</div>
+
+<div id="chart_container_clone" style="display: none">
+    <img id="chart_container_image"> </img>
+</div>
+
+<div class="trade_container dark">
+    <div class="m_cent">
+        <div class="m_guadan">
+            <ul id="tabList">
+                <li id="orderbookTab" class="current" data-show="orderbook">深度</li>
+                <li id="tradesTab" data-show="trades">成交</li>
+                <li id="descriptionTab" data-show="description">简介</li>
+            </ul>
+            <div id="orderbook">
+                <div id="asks">
+                    <div class="table"></div>
+                </div>
+                <div id="bids">
+                    <div class="table"></div>
+                </div>
+            </div>
+            <div id="trades" class="trades">
+                <div class="trades_list"></div>
+            </div>
+            <div id="description">
+
+            </div>
+        </div>
+    </div>
 </div>
 
 <div style="display: none" id="chart_language_switch_tmp">

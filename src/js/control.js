@@ -228,11 +228,12 @@ export class Control {
         }
         if (Kline.instance.data.trades && Kline.instance.data.trades.length > 0) {
             KlineTrade.instance.pushTrades(Kline.instance.data.trades);
-            KlineTrade.instance.klineTradeInit = true;
+            KlineTrade.instance.klineTradeInit = false;
         }
         if (Kline.instance.data.depths) {
             KlineTrade.instance.updateDepth(Kline.instance.data.depths);
         }
+
         Control.clearRefreshCounter();
 
         if (Kline.instance.type === 'poll') {
@@ -482,7 +483,7 @@ export class Control {
         let intervalTime = Kline.instance.tradesIntervalTime;
         if (res && res.length > 0) {
             KlineTrade.instance.pushTrades(res);
-            KlineTrade.instance.klineTradeInit = true;
+            KlineTrade.instance.klineTradeInit = false;
         }
         if (Kline.instance.type === 'poll') {
             Kline.instance.tradesTimer = setTimeout(Control.tradesRequestData, intervalTime);
@@ -672,15 +673,34 @@ export class Control {
         canvasGroup.css({
             left: canvasGroupRect.x + 'px',
             top: canvasGroupRect.y + 'px',
-            // width: canvasGroupRect.w + 'px',
+            width: canvasGroupRect.w + 'px',
             height: canvasGroupRect.h + 'px'
         });
         let mainCanvas = $('#chart_mainCanvas')[0];
         let overlayCanvas = $('#chart_overlayCanvas')[0];
-        mainCanvas.width = canvasGroupRect.w;
-        mainCanvas.height = canvasGroupRect.h;
-        overlayCanvas.width = canvasGroupRect.w;
-        overlayCanvas.height = canvasGroupRect.h;
+
+        let devicePixelRatio = window.devicePixelRatio;
+        let context = mainCanvas.getContext("2d");
+        let backingStoreRatio = context.webkitBackingStorePixelRatio ||
+            context.mozBackingStorePixelRatio ||
+            context.msBackingStorePixelRatio ||
+            context.oBackingStorePixelRatio ||
+            context.backingStorePixelRatio || 1;
+
+
+        let ratio = devicePixelRatio / backingStoreRatio;
+        Kline.instance.deviceRatio = ratio;
+
+        mainCanvas.width = canvasGroupRect.w* ratio;
+        mainCanvas.height = canvasGroupRect.h* ratio;
+        overlayCanvas.width = canvasGroupRect.w* ratio;;
+        overlayCanvas.height = canvasGroupRect.h* ratio;;
+       
+        mainCanvas.style.width = canvasGroupRect.w + 'px';
+        mainCanvas.style.height = canvasGroupRect.h + "px";
+        overlayCanvas.style.width = canvasGroupRect.w + 'px';
+        overlayCanvas.style.height = canvasGroupRect.h + 'px';
+        
         if (tabBarShown) {
             tabBar.css({
                 left: tabBarRect.x + 'px',

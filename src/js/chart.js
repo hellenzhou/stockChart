@@ -108,7 +108,7 @@ export class Chart {
         Control.klineRequestData(true);
         Control.tradesRequestData();
         Control.depthRequestData();
-        
+
         ChartManager.instance.redraw('All', false);
     }
 
@@ -141,7 +141,8 @@ export class Chart {
     updateDepth(array) {
         if (array === null) {
             this._depthData.array = [];
-            ChartManager.instance.redraw('All', false);
+            // modify
+          //  ChartManager.instance.redraw('All', false);
             return;
         }
         if (!array.asks || !array.bids || array.asks === '' || array.bids === '')
@@ -180,7 +181,8 @@ export class Chart {
                 _data.array[i].amounts = _data.array[i - 1].amounts + _data.array[i].amount;
             }
         }
-        ChartManager.instance.redraw('All', false);
+         // modify
+        //ChartManager.instance.redraw('All', false);
     }
 
     setMainIndicator(indicName) {
