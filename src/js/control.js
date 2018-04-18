@@ -547,6 +547,8 @@ export class Control {
         Kline.instance.symbol = symbol;
         Control.switchSymbolSelected(symbol);
         let period = tmp.charts.period;
+        // modify  add 
+        Kline.instance.periodTitle = $(".chart_str_period").text();
         Control.switchPeriod(period);
         $('#chart_period_' + period + '_v a').addClass('selected');
         $('#chart_period_' + period + '_h a').addClass('selected');
@@ -622,8 +624,16 @@ export class Control {
 
     static onSize(w, h) {
         let width = w || window.innerWidth;
-        let chartWidth = Kline.instance.showTrade ? (width - Kline.instance.tradeWidth) : width;
+        let chartWidth = width;
+        //Kline.instance.showTrade ? (width - Kline.instance.tradeWidth) : width;
+        //modify 右侧的行情面板
         let height = h || window.innerHeight;
+
+        let remainHeight = height;
+        if (Kline.instance.showTrade && !isNaN(Kline.instance.tradeHeight)) {
+            remainHeight -= Kline.instance.tradeHeight;
+        }
+
         let container = $(Kline.instance.element);
         container.css({
             width: width + 'px',
@@ -644,17 +654,19 @@ export class Control {
         toolPanelRect.x = 0;
         toolPanelRect.y = toolBarRect.h + 1;
         toolPanelRect.w = toolPanelShown ? 32 : 0;
-        toolPanelRect.h = height - toolPanelRect.y;
+        toolPanelRect.h = remainHeight - toolPanelRect.y;
+        
         let tabBarRect = {};
         tabBarRect.w = toolPanelShown ? chartWidth - (toolPanelRect.w + 1) : chartWidth;
         tabBarRect.h = tabBarShown ? 22 : -1;
         tabBarRect.x = chartWidth - tabBarRect.w;
-        tabBarRect.y = height - (tabBarRect.h + 1);
+        tabBarRect.y = remainHeight - (tabBarRect.h + 1);
         let canvasGroupRect = {};
         canvasGroupRect.x = tabBarRect.x;
         canvasGroupRect.y = toolPanelRect.y;
         canvasGroupRect.w = tabBarRect.w;
         canvasGroupRect.h = tabBarRect.y - toolPanelRect.y;
+
         toolBar.css({
             left: toolBarRect.x + 'px',
             top: toolBarRect.y + 'px',
@@ -709,11 +721,15 @@ export class Control {
                 height: tabBarRect.h + 'px'
             });
         }
+
         let dlgSettings = $("#chart_parameter_settings");
+       
         dlgSettings.css({
             left: (chartWidth - dlgSettings.width()) >> 1,
-            top: (height - dlgSettings.height()) >> 1
+            top: (height - dlgSettings.height()) >> 1,
+            display:'none'
         });
+
         let dlgLoading = $("#chart_loading");
         dlgLoading.css({
             left: (chartWidth - dlgLoading.width()) >> 1,
@@ -728,7 +744,12 @@ export class Control {
         let showIndic = $('#chart_show_indicator')[0];
         let showTools = $('#chart_show_tools')[0];
         let selectTheme = $('#chart_toolbar_theme')[0];
+        
         let dropDownSettings = $('#chart_dropdown_settings');
+
+        dropDownSettings.css('display',"none");
+        $("#chart_language_setting_div").css('display',"none");
+        
         let periodsVertNW = periodsVert[0].offsetWidth;
         let periodsHorzNW = periodsVertNW + periodsHorz.offsetWidth;
         let showIndicNW = periodsHorzNW + showIndic.offsetWidth + 4;

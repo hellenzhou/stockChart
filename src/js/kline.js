@@ -122,7 +122,8 @@ export default class Kline {
         this.bottomShowTrade = false;
         this.showLanguageSelect = false;
         this.showDrawTool = false;
-
+        this.tradeHeight = 44;
+        
         Object.assign(this, option);
 
         if (!Kline.created) {
@@ -387,11 +388,22 @@ export default class Kline {
             $(".chart_container .chart_toolbar_tabgroup a")
                 .click(function () {
                     Control.switchPeriod($(this).parent().attr('name'));
+                    // modify  add 
+                    $(".chart_str_period").removeClass('selected');
+                    if (Kline.instance.periodTitle && Kline.instance.periodTitle.length > 0) {
+                        $(".chart_str_period").text(Kline.instance.periodTitle);
+                    }
 
                 });
             $("#chart_toolbar_periods_vert ul a").click(function () {
 
                 Control.switchPeriod($(this).parent().attr('name'));
+                 // modify  add 
+                let pdescribe = $(this).text();
+                if (pdescribe != undefined && typeof (pdescribe) === "string") {
+                    $(".chart_str_period").text(pdescribe);
+                    $(".chart_str_period").addClass('selected');
+                }
 
             });
 

@@ -1,4 +1,3 @@
-
 <!-- <div class="trade_container dark hide">
     <div class="m_cent">
         <div class="m_guadan">
@@ -28,25 +27,25 @@
 </div> -->
 
 <div id="chart_container_fullscreen" style="display: none">
-    </div>
-    
-    <div class="chart_trade_quotation">
-        <ul id="chart_trade_quotation_content">
-            <li>
-                <div class="symbol-title">
-                    <a class="white"></a>
-                </div>
-            </li>
-            <li>
-                <div id="price" class="green"></div>
-            </li>
-            <li>=444444CNY +4.53%</li>
-            <li>高 7497.85</li>
-            <li>低 6519.83</li>
-            <!-- <li>24H 2567.8</li> -->
-        </ul>
-    </div>
- 
+</div>
+
+<div class="chart_trade_quotation">
+    <ul id="chart_trade_quotation_content">
+        <li>
+            <div class="symbol-title">
+                <a class="white"></a>
+            </div>
+        </li>
+        <li>
+            <div id="price" class="green"></div>
+        </li>
+        <li>=444444CNY +4.53%</li>
+        <li>高 7497.85</li>
+        <li>低 6519.83</li>
+        <!-- <li>24H 2567.8</li> -->
+    </ul>
+</div>
+
 <div class="chart_container dark">
     <div id="chart_dom_elem_cache"></div>
     <!-- ToolBar -->
@@ -407,6 +406,32 @@
             <button style="color: red;" id="clearCanvas" title="Clear All">X</button>
         </div>
     </div>
+
+    <div class="chart_dropdown" id="chart_main_indicator">
+        <div class="chart_dropdown_t">
+            <a class="chart_indicator_settings">指标</a>
+        </div>
+        <div class="chart_dropdown_data" style="margin-left: -142px;">
+            <ul>
+                <li>
+                    <a name="MA" class="selected">MA</a>
+                </li>
+                <li>
+                    <a name="EMA" class="">EMA</a>
+                </li>
+                <li>
+                    <a name="BOLL" class="">BOLL</a>
+                </li>
+                <li>
+                    <a name="SAR" class="">SAR</a>
+                </li>
+                <li>
+                    <a name="NONE" class="">None</a>
+                </li>
+            </ul>
+        </div>
+    </div>
+
     <div id="chart_canvasGroup" class="temp">
         <canvas class="chart_canvas" id="chart_mainCanvas" style="cursor: default;"></canvas>
         <canvas class="chart_canvas" id="chart_overlayCanvas" style="cursor: default;"></canvas>
@@ -712,7 +737,7 @@
     <img id="chart_container_image"> </img>
 </div>
 
-<div class="trade_container dark">
+<div class="trade_container dark hide">
     <div class="m_cent">
         <div class="m_guadan">
             <ul id="tabList">

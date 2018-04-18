@@ -1455,3 +1455,14 @@ li {
     width: 20px;
     height: 20px
 }
+
+
+#chart_main_indicator {
+    float: right;
+    right: 12px;
+}
+
+#chart_main_indicator li {
+    line-height: 24px;
+    display: block;
+}
