@@ -1,8 +1,8 @@
-import {Control} from './control'
-import {KlineTrade} from './kline_trade'
-import {ChartManager} from './chart_manager'
-import {ChartSettings} from './chart_settings'
-import {Template} from './templates'
+import { Control } from './control'
+import { KlineTrade } from './kline_trade'
+import { ChartManager } from './chart_manager'
+import { ChartSettings } from './chart_settings'
+import { Template } from './templates'
 import '../css/main.css'
 import tpl from '../view/tpl.html'
 import fire from './firebase'
@@ -38,7 +38,7 @@ export default class Kline {
         this.debug = true;
         this.language = "zh-cn";
         this.theme = "dark";
-        this.ranges = ["1w", "1d", "1h", "30m", "15m", "5m", "1m", "line"];
+        this.ranges = ["line", "1m", "1d", "5m", "15m", "30m", "1h", "4h", "12h", "1w"];
         this.showTrade = true;
         this.tradeWidth = 250;
         this.socketConnected = false;
@@ -47,7 +47,7 @@ export default class Kline {
         this.isSized = false;
         this.paused = false;
         this.subscribed = null;
-        this.disableFirebase = false;
+        this.disableFirebase = true;
 
         this.periodMap = {
             "01w": 7 * 86400 * 1000,
@@ -83,6 +83,44 @@ export default class Kline {
             "line": "line"
         };
 
+        /*api文档  https://www.zb.com/i/developer/restApi#config */
+        /*k线数据 参考文档type  since  size */
+        this.klineBaseUrl = 'http://api.bitkk.com/data/v1/kline';
+        this.klineMarketName = 'market';
+        this.klineTypeName = 'type';
+        this.klineSizeName = 'size';
+        this.klineSinceName = 'since';
+        this.klineSizeValue = '1000';
+
+        this.klineSinceValue = null;
+        this.G_KLINE_HTTP_REQUEST = null;
+        this.klineData = {};
+        this.klineTimer = null;
+        this.klineIntervalTime = 3000;
+
+        //行情数据
+        this.tradesBaseUrl = 'http://api.bitkk.com/data/v1/trades';
+        this.tradesMarketName = 'market';
+        this.G_TRADES_HTTP_REQUEST = null;
+        this.tradesData = {};
+        this.tradesTimer = null;
+        this.tradesIntervalTime = 8000;
+
+        //市场深度数据
+        this.depthBaseUrl = 'http://api.bitkk.com/data/v1/depth';
+        this.depthMarketName = 'market';
+        this.G_DEPTH_HTTP_REQUEST = null;
+        this.depthData = {};
+        this.depthTimer = null;
+        this.depthIntervalTime = 8000;
+
+    
+        this.chatPeriodToolRanages = [];
+        this.periodTitle = null;
+        this.periodAreaRanages = null;
+        this.deviceRatio = 2;
+        this.bottomShowTrade = fase;
+        
         Object.assign(this, option);
 
         if (!Kline.created) {
@@ -96,6 +134,18 @@ export default class Kline {
     /*********************************************
      * Methods
      *********************************************/
+    periodsVertDisplayNone(array) {
+        if (array && array !== undefined && !(Array.isArray(array) && array.length > 0)) {
+            this.periodAreaRanages = array;
+            for (let k in this.ranges) {
+                let curPeriod = this.ranges[k];
+                if (curPeriod && typeof (curPeriod) === "string" && array.indexOf(curPeriod) >= 0) {
+                    let nodeName = '#chart_period_' + curPeriod + '_v';
+                    $(nodeName).attr('style', "display:none");
+                }
+            }
+        }
+    }
 
     draw() {
         Kline.trade = new KlineTrade();
@@ -129,7 +179,7 @@ export default class Kline {
         this.setTheme(this.theme);
         this.setLanguage(this.language);
 
-        $(this.element).css({visibility: "visible"});
+        $(this.element).css({ visibility: "visible" });
     }
 
     resize(width, height) {
@@ -296,7 +346,7 @@ export default class Kline {
                     } else {
                         d += 4;
                     }
-                    dropdown.css({"margin-left": -d});
+                    dropdown.css({ "margin-left": -d });
                     title.addClass("chart_dropdown-hover");
                     dropdown.addClass("chart_dropdown-hover");
                 })
@@ -590,14 +640,14 @@ export default class Kline {
                     });
 
                     Control.onSize();
-                    $('html,body').css({width: '100%', height: '100%', overflow: 'hidden'});
+                    $('html,body').css({ width: '100%', height: '100%', overflow: 'hidden' });
                 } else {
                     $(Kline.instance.element).attr('style', '');
 
                     $('html,body').attr('style', '');
 
                     Control.onSize(Kline.instance.width, Kline.instance.height);
-                    $(Kline.instance.element).css({visibility: 'visible', height: Kline.instance.height + 'px'});
+                    $(Kline.instance.element).css({ visibility: 'visible', height: Kline.instance.height + 'px' });
                 }
             });
 

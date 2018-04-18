@@ -1,7 +1,7 @@
-import {ChartManager} from './chart_manager'
-import {Control} from './control'
+import { ChartManager } from './chart_manager'
+import { Control } from './control'
 import Kline from './kline'
-import {Template} from './templates'
+import { Template } from './templates'
 
 export class Chart {
 
@@ -99,11 +99,16 @@ export class Chart {
 
         if (f === -1) {
             Kline.instance.requestParam = Control.setHttpRequestParam(Kline.instance.symbol, Kline.instance.range, Kline.instance.limit, null);
-            Control.requestData(true);
+            // Control.requestData(true);
         } else {
             Kline.instance.requestParam = Control.setHttpRequestParam(Kline.instance.symbol, Kline.instance.range, null, f.toString());
-            Control.requestData();
+            // Control.requestData();
         }
+
+        Control.klineRequestData(true);
+        Control.tradesRequestData();
+        Control.depthRequestData();
+        
         ChartManager.instance.redraw('All', false);
     }
 
@@ -164,7 +169,7 @@ export class Chart {
         for (let i = _data.asks_si; i >= _data.asks_ei; i--) {
             if (i === _data.asks_si && _data.array[i] !== undefined) {
                 _data.array[i].amounts = _data.array[i].amount;
-            } else if(_data.array[i + 1] !== undefined) {
+            } else if (_data.array[i + 1] !== undefined) {
                 _data.array[i].amounts = _data.array[i + 1].amounts + _data.array[i].amount;
             }
         }
@@ -220,5 +225,9 @@ export class Chart {
         ChartManager.instance.removeIndicator(areaName);
         ChartManager.instance.redraw('All', true);
     };
+
+    getRange() {
+        return this._range;
+    }
 
 }
