@@ -655,7 +655,7 @@ export class Control {
         toolPanelRect.y = toolBarRect.h + 1;
         toolPanelRect.w = toolPanelShown ? 32 : 0;
         toolPanelRect.h = remainHeight - toolPanelRect.y;
-        
+
         let tabBarRect = {};
         tabBarRect.w = toolPanelShown ? chartWidth - (toolPanelRect.w + 1) : chartWidth;
         tabBarRect.h = tabBarShown ? 22 : -1;
@@ -703,16 +703,16 @@ export class Control {
         let ratio = devicePixelRatio / backingStoreRatio;
         Kline.instance.deviceRatio = ratio;
 
-        mainCanvas.width = canvasGroupRect.w* ratio;
-        mainCanvas.height = canvasGroupRect.h* ratio;
-        overlayCanvas.width = canvasGroupRect.w* ratio;;
-        overlayCanvas.height = canvasGroupRect.h* ratio;;
-       
+        mainCanvas.width = canvasGroupRect.w * ratio;
+        mainCanvas.height = canvasGroupRect.h * ratio;
+        overlayCanvas.width = canvasGroupRect.w * ratio;;
+        overlayCanvas.height = canvasGroupRect.h * ratio;;
+
         mainCanvas.style.width = canvasGroupRect.w + 'px';
         mainCanvas.style.height = canvasGroupRect.h + "px";
         overlayCanvas.style.width = canvasGroupRect.w + 'px';
         overlayCanvas.style.height = canvasGroupRect.h + 'px';
-        
+
         if (tabBarShown) {
             tabBar.css({
                 left: tabBarRect.x + 'px',
@@ -723,11 +723,11 @@ export class Control {
         }
 
         let dlgSettings = $("#chart_parameter_settings");
-       
+
         dlgSettings.css({
             left: (chartWidth - dlgSettings.width()) >> 1,
             top: (height - dlgSettings.height()) >> 1,
-            display:'none'
+            display: 'none'
         });
 
         let dlgLoading = $("#chart_loading");
@@ -739,17 +739,50 @@ export class Control {
         let rowTheme = $('#chart_select_theme')[0];
         let rowTools = $('#chart_enable_tools')[0];
         let rowIndic = $('#chart_enable_indicator')[0];
-        let periodsVert = $('#chart_toolbar_periods_vert');
-        let periodsHorz = $('#chart_toolbar_periods_horz')[0];
+        // modify
+        let periodsVert = $('#chart_toolbar_periods_vert'); //周期
+        let periodsHorz = $('#chart_toolbar_periods_horz')[0]; // 分时 5 分钟
+        let mainIndicator = $('#chart_main_indicator')[0]; //指标
+        let sizeIcon = $('#chart_updated_time')[0];
+        let chatPeriodToolRanages = [];
+        // 根据时间计算显示个数
+        let ranges = Kline.instance.ranges;
+        let periodShowWidth = chartWidth - mainIndicator.offsetWidth -4 - periodsVert[0].offsetWidth - sizeIcon.offsetWidth;
+        let totalCount = ranges.length;
+        let showCount = totalCount;
+        let totalWidth = 0;
+
+        for (let i = 0; i < totalCount; i++) {
+            let dom = $('#chart_period_' + ranges[i] + '_h');
+            dom.show();
+            totalWidth += dom.width();
+            if (totalWidth > periodShowWidth - periodsVert.width()) {
+                dom.hide();
+                showCount--;
+            } else {
+                chatPeriodToolRanages.push(ranges[i])
+            }
+        }
+
+        debugger
+        if (showCount < ranges.length) {
+            periodsVert.show();
+            Kline.instance.periodsVertDisplayNone(chatPeriodToolRanages);
+        } else {
+            periodsVert.hide();
+        }
+
+        /////
+
         let showIndic = $('#chart_show_indicator')[0];
         let showTools = $('#chart_show_tools')[0];
         let selectTheme = $('#chart_toolbar_theme')[0];
-        
+
         let dropDownSettings = $('#chart_dropdown_settings');
 
-        dropDownSettings.css('display',"none");
-        $("#chart_language_setting_div").css('display',"none");
-        
+        dropDownSettings.css('display', "none");
+        $("#chart_language_setting_div").css('display', "none");
+
         let periodsVertNW = periodsVert[0].offsetWidth;
         let periodsHorzNW = periodsVertNW + periodsHorz.offsetWidth;
         let showIndicNW = periodsHorzNW + showIndic.offsetWidth + 4;
@@ -762,11 +795,11 @@ export class Control {
         showToolsNW += dropDownSettingsW;
         selectThemeNW += dropDownSettingsW;
 
-        if (chartWidth < periodsHorzNW) {
-            domElemCache.append(periodsHorz);
-        } else {
-            periodsVert.after(periodsHorz);
-        }
+        // if (chartWidth < periodsHorzNW) {
+        //     domElemCache.append(periodsHorz);
+        // } else {
+        //     periodsVert.after(periodsHorz);
+        // }
         if (chartWidth < showIndicNW) {
             domElemCache.append(showIndic);
             rowIndic.style.display = "";

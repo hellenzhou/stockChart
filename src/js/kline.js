@@ -138,7 +138,7 @@ export default class Kline {
      * Methods
      *********************************************/
     periodsVertDisplayNone(array) {
-        if (array && array !== undefined && !(Array.isArray(array) && array.length > 0)) {
+        if (array  && Array.isArray(array) && array.length > 0) {
             this.periodAreaRanages = array;
             for (let k in this.ranges) {
                 let curPeriod = this.ranges[k];
@@ -770,6 +770,25 @@ export default class Kline {
                 currentTarget.addClass("current");
                 currentTarget.siblings().removeClass("current");
             });
+            // modify  add
+            $("#chart_main_indicator li")
+            .click(function () {
+                $("#chart_main_indicator a").removeClass('selected');
+                $(this).find('a').addClass("selected");
+                let name = $(this).find('a').attr('name');
+                let tmp = ChartSettings.get();
+                tmp.charts.mIndic = name;
+                ChartSettings.save();
+
+                let mgr = ChartManager.instance;
+                if (!mgr.setMainIndicator("frame0.k0", name))
+                    mgr.removeMainIndicator("frame0.k0");
+                mgr.redraw();
+
+                $("#chart_main_indicator .chart_dropdown_data").removeClass("chart_dropdown-hover");
+                $("#chart_main_indicator .chart_dropdown_t").removeClass("chart_dropdown-hover");
+            });
+
         })
 
     }

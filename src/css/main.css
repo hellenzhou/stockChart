@@ -451,11 +451,18 @@ li {
     border-color: #f27935
 }
 
-.chart_container #chart_updated_time {
+/* .chart_container #chart_updated_time {
     float: right;
     margin: 4px 3px;
     padding: 3px 10px
+} */
+
+.chart_container #chart_updated_time {
+    float: right;
+    margin: 4px 3px;
+    padding: 3px 6px
 }
+
 
 .chart_container.dark #chart_updated_time {
     color: #e5e5e5
@@ -1457,10 +1464,10 @@ li {
 }
 
 
-#chart_main_indicator {
+/* #chart_main_indicator {
     float: right;
     right: 12px;
-}
+} */
 
 #chart_main_indicator li {
     line-height: 24px;
