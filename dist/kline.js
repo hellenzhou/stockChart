@@ -1342,7 +1342,7 @@ var ranges = _interopRequireWildcard(__webpack_require__(61));
 
 var templates = _interopRequireWildcard(__webpack_require__(27));
 
-var data_sources = _interopRequireWildcard(__webpack_require__(12));
+var data_sources = _interopRequireWildcard(__webpack_require__(13));
 
 var _chart_settings = __webpack_require__(20);
 
@@ -1357,6 +1357,10 @@ var ctools = _interopRequireWildcard(__webpack_require__(40));
 var areas = _interopRequireWildcard(__webpack_require__(43));
 
 var _util = __webpack_require__(21);
+
+var _kline = _interopRequireDefault(__webpack_require__(12));
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) { var desc = Object.defineProperty && Object.getOwnPropertyDescriptor ? Object.getOwnPropertyDescriptor(obj, key) : {}; if (desc.get || desc.set) { Object.defineProperty(newObj, key, desc); } else { newObj[key] = obj[key]; } } } } newObj.default = obj; return newObj; } }
 
@@ -1397,6 +1401,8 @@ function () {
     this._overlayCanvas = null;
     this._mainContext = null;
     this._overlayContext = null;
+    this._x = 0;
+    this._y = 0;
 
     if (!ChartManager.created) {
       ChartManager.instance = this;
@@ -1407,6 +1413,12 @@ function () {
   }
 
   _createClass(ChartManager, [{
+    key: "setxy",
+    value: function setxy(x, y) {
+      this._x = x;
+      this._y = y;
+    }
+  }, {
     key: "redraw",
     value: function redraw(layer, refresh) {
       if (layer === undefined || refresh) {
@@ -1416,13 +1428,20 @@ function () {
       if (layer === "All" || layer === "MainCanvas") {
         if (refresh) {
           this.getFrame("frame0").setChanged(true);
+        } //modify 
+
+
+        if (this._x === 0) {
+          this.layout(this._mainContext, "frame0", 0, 0, this._mainCanvas.width, this._mainCanvas.height);
+        } else {
+          this.layout(this._mainContext, "frame0", -368 * 3, -207 * 3, this._mainCanvas.height + -368 * 3, this._mainCanvas.width + -207 * 3);
         }
 
-        this.layout(this._mainContext, "frame0", 0, 0, this._mainCanvas.width, this._mainCanvas.height);
         this.drawMain("frame0", this._mainContext);
       }
 
       if (layer === "All" || layer === "OverlayCanvas") {
+        //modify 
         this._overlayContext.clearRect(0, 0, this._overlayCanvas.width, this._overlayCanvas.height);
 
         this.drawOverlay("frame0", this._overlayContext);
@@ -3833,953 +3852,6 @@ var firebase = Object(__WEBPACK_IMPORTED_MODULE_0__src_firebaseApp__["a" /* crea
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.MainDataSource = exports.DataSource = void 0;
-
-var _named_object = __webpack_require__(9);
-
-var _ctool_manager = __webpack_require__(106);
-
-var _kline = _interopRequireDefault(__webpack_require__(17));
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-function _typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
-
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
-
-function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
-
-function _possibleConstructorReturn(self, call) { if (call && (_typeof(call) === "object" || typeof call === "function")) { return call; } return _assertThisInitialized(self); }
-
-function _assertThisInitialized(self) { if (self === void 0) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return self; }
-
-function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function"); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
-
-var DataSource =
-/*#__PURE__*/
-function (_NamedObject) {
-  _inherits(DataSource, _NamedObject);
-
-  function DataSource(name) {
-    _classCallCheck(this, DataSource);
-
-    return _possibleConstructorReturn(this, (DataSource.__proto__ || Object.getPrototypeOf(DataSource)).call(this, name));
-  }
-
-  _createClass(DataSource, [{
-    key: "getUpdateMode",
-    value: function getUpdateMode() {
-      return this._updateMode;
-    }
-  }, {
-    key: "setUpdateMode",
-    value: function setUpdateMode(mode) {
-      this._updateMode = mode;
-    }
-  }, {
-    key: "getCacheSize",
-    value: function getCacheSize() {
-      return 0;
-    }
-  }, {
-    key: "getDataCount",
-    value: function getDataCount() {
-      return 0;
-    }
-  }, {
-    key: "getDataAt",
-    value: function getDataAt(index) {
-      return this._dataItems[index];
-    }
-  }]);
-
-  return DataSource;
-}(_named_object.NamedObject);
-
-exports.DataSource = DataSource;
-DataSource.UpdateMode = {
-  DoNothing: 0,
-  Refresh: 1,
-  Update: 2,
-  Append: 3
-};
-
-var MainDataSource =
-/*#__PURE__*/
-function (_DataSource) {
-  _inherits(MainDataSource, _DataSource);
-
-  function MainDataSource(name) {
-    var _this;
-
-    _classCallCheck(this, MainDataSource);
-
-    _this = _possibleConstructorReturn(this, (MainDataSource.__proto__ || Object.getPrototypeOf(MainDataSource)).call(this, name));
-    _this._erasedCount = 0;
-    _this._dataItems = [];
-    _this._decimalDigits = 0;
-    _this.toolManager = new _ctool_manager.CToolManager(name);
-    return _this;
-  }
-
-  _createClass(MainDataSource, [{
-    key: "getCacheSize",
-    value: function getCacheSize() {
-      return this._dataItems.length;
-    }
-  }, {
-    key: "getDataCount",
-    value: function getDataCount() {
-      return this._dataItems.length;
-    }
-  }, {
-    key: "getUpdatedCount",
-    value: function getUpdatedCount() {
-      return this._updatedCount;
-    }
-  }, {
-    key: "getAppendedCount",
-    value: function getAppendedCount() {
-      return this._appendedCount;
-    }
-  }, {
-    key: "getErasedCount",
-    value: function getErasedCount() {
-      return this._erasedCount;
-    }
-  }, {
-    key: "getDecimalDigits",
-    value: function getDecimalDigits() {
-      return this._decimalDigits;
-    }
-  }, {
-    key: "calcDecimalDigits",
-    value: function calcDecimalDigits(v) {
-      var str = "" + v;
-      var i = str.indexOf('.');
-
-      if (i < 0) {
-        return 0;
-      }
-
-      return str.length - 1 - i;
-    }
-  }, {
-    key: "getLastDate",
-    value: function getLastDate() {
-      var count = this.getDataCount();
-
-      if (count < 1) {
-        return -1;
-      }
-
-      return this.getDataAt(count - 1).date;
-    }
-  }, {
-    key: "getDataAt",
-    value: function getDataAt(index) {
-      return this._dataItems[index];
-    }
-  }, {
-    key: "update",
-    value: function update(data) {
-      this._updatedCount = 0;
-      this._appendedCount = 0;
-      this._erasedCount = 0;
-      var len = this._dataItems.length;
-
-      if (len > 0) {
-        var lastIndex = len - 1;
-        var lastItem = this._dataItems[lastIndex];
-
-        var _e,
-            _i,
-            _cnt = data.length;
-
-        for (_i = 0; _i < _cnt; _i++) {
-          _e = data[_i];
-
-          if (_e[0] === lastItem.date) {
-            if (lastItem.open === _e[1] && lastItem.high === _e[2] && lastItem.low === _e[3] && lastItem.close === _e[4] && lastItem.volume === _e[5]) {
-              this.setUpdateMode(DataSource.UpdateMode.DoNothing);
-            } else {
-              this.setUpdateMode(DataSource.UpdateMode.Update);
-              this._dataItems[lastIndex] = {
-                date: _e[0],
-                open: _e[1],
-                high: _e[2],
-                low: _e[3],
-                close: _e[4],
-                volume: _e[5]
-              };
-              this._updatedCount++;
-            }
-
-            _i++;
-
-            if (_i < _cnt) {
-              this.setUpdateMode(DataSource.UpdateMode.Append);
-
-              for (; _i < _cnt; _i++, this._appendedCount++) {
-                _e = data[_i];
-
-                this._dataItems.push({
-                  date: _e[0],
-                  open: _e[1],
-                  high: _e[2],
-                  low: _e[3],
-                  close: _e[4],
-                  volume: _e[5]
-                });
-              }
-            }
-
-            return true;
-          }
-        }
-
-        if (_cnt < _kline.default.instance.limit) {
-          this.setUpdateMode(DataSource.UpdateMode.DoNothing);
-          return false;
-        }
-      }
-
-      this.setUpdateMode(DataSource.UpdateMode.Refresh);
-      this._dataItems = [];
-      var d,
-          n,
-          e,
-          i,
-          cnt = data.length;
-
-      for (i = 0; i < cnt; i++) {
-        e = data[i];
-
-        for (n = 1; n <= 4; n++) {
-          d = this.calcDecimalDigits(e[n]);
-          if (this._decimalDigits < d) this._decimalDigits = d;
-        }
-
-        this._dataItems.push({
-          date: e[0],
-          open: e[1],
-          high: e[2],
-          low: e[3],
-          close: e[4],
-          volume: e[5]
-        });
-      }
-
-      return true;
-    }
-  }, {
-    key: "select",
-    value: function select(id) {
-      this.toolManager.selecedObject = id;
-    }
-  }, {
-    key: "unselect",
-    value: function unselect() {
-      this.toolManager.selecedObject = -1;
-    }
-  }, {
-    key: "addToolObject",
-    value: function addToolObject(toolObject) {
-      this.toolManager.addToolObject(toolObject);
-    }
-  }, {
-    key: "delToolObject",
-    value: function delToolObject() {
-      this.toolManager.delCurrentObject();
-    }
-  }, {
-    key: "getToolObject",
-    value: function getToolObject(index) {
-      return this.toolManager.getToolObject(index);
-    }
-  }, {
-    key: "getToolObjectCount",
-    value: function getToolObjectCount() {
-      return this.toolManager.toolObjects.length;
-    }
-  }, {
-    key: "getCurrentToolObject",
-    value: function getCurrentToolObject() {
-      return this.toolManager.getCurrentObject();
-    }
-  }, {
-    key: "getSelectToolObjcet",
-    value: function getSelectToolObjcet() {
-      return this.toolManager.getSelectedObject();
-    }
-  }, {
-    key: "delSelectToolObject",
-    value: function delSelectToolObject() {
-      this.toolManager.delSelectedObject();
-    }
-  }]);
-
-  return MainDataSource;
-}(DataSource);
-
-exports.MainDataSource = MainDataSource;
-
-/***/ }),
-/* 13 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-/**
- * Copyright 2017 Google Inc.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *   http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-Object.defineProperty(exports, "__esModule", { value: true });
-var Path_1 = __webpack_require__(2);
-var util_1 = __webpack_require__(0);
-var util_2 = __webpack_require__(1);
-var util_3 = __webpack_require__(0);
-var util_4 = __webpack_require__(0);
-/**
- * True for invalid Firebase keys
- * @type {RegExp}
- * @private
- */
-exports.INVALID_KEY_REGEX_ = /[\[\].#$\/\u0000-\u001F\u007F]/;
-/**
- * True for invalid Firebase paths.
- * Allows '/' in paths.
- * @type {RegExp}
- * @private
- */
-exports.INVALID_PATH_REGEX_ = /[\[\].#$\u0000-\u001F\u007F]/;
-/**
- * Maximum number of characters to allow in leaf value
- * @type {number}
- * @private
- */
-exports.MAX_LEAF_SIZE_ = 10 * 1024 * 1024;
-/**
- * @param {*} key
- * @return {boolean}
- */
-exports.isValidKey = function (key) {
-    return (typeof key === 'string' && key.length !== 0 && !exports.INVALID_KEY_REGEX_.test(key));
-};
-/**
- * @param {string} pathString
- * @return {boolean}
- */
-exports.isValidPathString = function (pathString) {
-    return (typeof pathString === 'string' &&
-        pathString.length !== 0 &&
-        !exports.INVALID_PATH_REGEX_.test(pathString));
-};
-/**
- * @param {string} pathString
- * @return {boolean}
- */
-exports.isValidRootPathString = function (pathString) {
-    if (pathString) {
-        // Allow '/.info/' at the beginning.
-        pathString = pathString.replace(/^\/*\.info(\/|$)/, '/');
-    }
-    return exports.isValidPathString(pathString);
-};
-/**
- * @param {*} priority
- * @return {boolean}
- */
-exports.isValidPriority = function (priority) {
-    return (priority === null ||
-        typeof priority === 'string' ||
-        (typeof priority === 'number' && !util_2.isInvalidJSONNumber(priority)) ||
-        (priority && typeof priority === 'object' && util_1.contains(priority, '.sv')));
-};
-/**
- * Pre-validate a datum passed as an argument to Firebase function.
- *
- * @param {string} fnName
- * @param {number} argumentNumber
- * @param {*} data
- * @param {!Path} path
- * @param {boolean} optional
- */
-exports.validateFirebaseDataArg = function (fnName, argumentNumber, data, path, optional) {
-    if (optional && data === undefined)
-        return;
-    exports.validateFirebaseData(util_3.errorPrefix(fnName, argumentNumber, optional), data, path);
-};
-/**
- * Validate a data object client-side before sending to server.
- *
- * @param {string} errorPrefix
- * @param {*} data
- * @param {!Path|!ValidationPath} path_
- */
-exports.validateFirebaseData = function (errorPrefix, data, path_) {
-    var path = path_ instanceof Path_1.Path ? new Path_1.ValidationPath(path_, errorPrefix) : path_;
-    if (data === undefined) {
-        throw new Error(errorPrefix + 'contains undefined ' + path.toErrorString());
-    }
-    if (typeof data === 'function') {
-        throw new Error(errorPrefix +
-            'contains a function ' +
-            path.toErrorString() +
-            ' with contents = ' +
-            data.toString());
-    }
-    if (util_2.isInvalidJSONNumber(data)) {
-        throw new Error(errorPrefix + 'contains ' + data.toString() + ' ' + path.toErrorString());
-    }
-    // Check max leaf size, but try to avoid the utf8 conversion if we can.
-    if (typeof data === 'string' &&
-        data.length > exports.MAX_LEAF_SIZE_ / 3 &&
-        util_4.stringLength(data) > exports.MAX_LEAF_SIZE_) {
-        throw new Error(errorPrefix +
-            'contains a string greater than ' +
-            exports.MAX_LEAF_SIZE_ +
-            ' utf8 bytes ' +
-            path.toErrorString() +
-            " ('" +
-            data.substring(0, 50) +
-            "...')");
-    }
-    // TODO = Perf = Consider combining the recursive validation of keys into NodeFromJSON
-    // to save extra walking of large objects.
-    if (data && typeof data === 'object') {
-        var hasDotValue_1 = false, hasActualChild_1 = false;
-        util_1.forEach(data, function (key, value) {
-            if (key === '.value') {
-                hasDotValue_1 = true;
-            }
-            else if (key !== '.priority' && key !== '.sv') {
-                hasActualChild_1 = true;
-                if (!exports.isValidKey(key)) {
-                    throw new Error(errorPrefix +
-                        ' contains an invalid key (' +
-                        key +
-                        ') ' +
-                        path.toErrorString() +
-                        '.  Keys must be non-empty strings ' +
-                        'and can\'t contain ".", "#", "$", "/", "[", or "]"');
-                }
-            }
-            path.push(key);
-            exports.validateFirebaseData(errorPrefix, value, path);
-            path.pop();
-        });
-        if (hasDotValue_1 && hasActualChild_1) {
-            throw new Error(errorPrefix +
-                ' contains ".value" child ' +
-                path.toErrorString() +
-                ' in addition to actual children.');
-        }
-    }
-};
-/**
- * Pre-validate paths passed in the firebase function.
- *
- * @param {string} errorPrefix
- * @param {Array<!Path>} mergePaths
- */
-exports.validateFirebaseMergePaths = function (errorPrefix, mergePaths) {
-    var i, curPath;
-    for (i = 0; i < mergePaths.length; i++) {
-        curPath = mergePaths[i];
-        var keys = curPath.slice();
-        for (var j = 0; j < keys.length; j++) {
-            if (keys[j] === '.priority' && j === keys.length - 1) {
-                // .priority is OK
-            }
-            else if (!exports.isValidKey(keys[j])) {
-                throw new Error(errorPrefix +
-                    'contains an invalid key (' +
-                    keys[j] +
-                    ') in path ' +
-                    curPath.toString() +
-                    '. Keys must be non-empty strings ' +
-                    'and can\'t contain ".", "#", "$", "/", "[", or "]"');
-            }
-        }
-    }
-    // Check that update keys are not descendants of each other.
-    // We rely on the property that sorting guarantees that ancestors come
-    // right before descendants.
-    mergePaths.sort(Path_1.Path.comparePaths);
-    var prevPath = null;
-    for (i = 0; i < mergePaths.length; i++) {
-        curPath = mergePaths[i];
-        if (prevPath !== null && prevPath.contains(curPath)) {
-            throw new Error(errorPrefix +
-                'contains a path ' +
-                prevPath.toString() +
-                ' that is ancestor of another path ' +
-                curPath.toString());
-        }
-        prevPath = curPath;
-    }
-};
-/**
- * pre-validate an object passed as an argument to firebase function (
- * must be an object - e.g. for firebase.update()).
- *
- * @param {string} fnName
- * @param {number} argumentNumber
- * @param {*} data
- * @param {!Path} path
- * @param {boolean} optional
- */
-exports.validateFirebaseMergeDataArg = function (fnName, argumentNumber, data, path, optional) {
-    if (optional && data === undefined)
-        return;
-    var errorPrefix = util_3.errorPrefix(fnName, argumentNumber, optional);
-    if (!(data && typeof data === 'object') || Array.isArray(data)) {
-        throw new Error(errorPrefix + ' must be an object containing the children to replace.');
-    }
-    var mergePaths = [];
-    util_1.forEach(data, function (key, value) {
-        var curPath = new Path_1.Path(key);
-        exports.validateFirebaseData(errorPrefix, value, path.child(curPath));
-        if (curPath.getBack() === '.priority') {
-            if (!exports.isValidPriority(value)) {
-                throw new Error(errorPrefix +
-                    "contains an invalid value for '" +
-                    curPath.toString() +
-                    "', which must be a valid " +
-                    'Firebase priority (a string, finite number, server value, or null).');
-            }
-        }
-        mergePaths.push(curPath);
-    });
-    exports.validateFirebaseMergePaths(errorPrefix, mergePaths);
-};
-exports.validatePriority = function (fnName, argumentNumber, priority, optional) {
-    if (optional && priority === undefined)
-        return;
-    if (util_2.isInvalidJSONNumber(priority))
-        throw new Error(util_3.errorPrefix(fnName, argumentNumber, optional) +
-            'is ' +
-            priority.toString() +
-            ', but must be a valid Firebase priority (a string, finite number, ' +
-            'server value, or null).');
-    // Special case to allow importing data with a .sv.
-    if (!exports.isValidPriority(priority))
-        throw new Error(util_3.errorPrefix(fnName, argumentNumber, optional) +
-            'must be a valid Firebase priority ' +
-            '(a string, finite number, server value, or null).');
-};
-exports.validateEventType = function (fnName, argumentNumber, eventType, optional) {
-    if (optional && eventType === undefined)
-        return;
-    switch (eventType) {
-        case 'value':
-        case 'child_added':
-        case 'child_removed':
-        case 'child_changed':
-        case 'child_moved':
-            break;
-        default:
-            throw new Error(util_3.errorPrefix(fnName, argumentNumber, optional) +
-                'must be a valid event type = "value", "child_added", "child_removed", ' +
-                '"child_changed", or "child_moved".');
-    }
-};
-exports.validateKey = function (fnName, argumentNumber, key, optional) {
-    if (optional && key === undefined)
-        return;
-    if (!exports.isValidKey(key))
-        throw new Error(util_3.errorPrefix(fnName, argumentNumber, optional) +
-            'was an invalid key = "' +
-            key +
-            '".  Firebase keys must be non-empty strings and ' +
-            'can\'t contain ".", "#", "$", "/", "[", or "]").');
-};
-exports.validatePathString = function (fnName, argumentNumber, pathString, optional) {
-    if (optional && pathString === undefined)
-        return;
-    if (!exports.isValidPathString(pathString))
-        throw new Error(util_3.errorPrefix(fnName, argumentNumber, optional) +
-            'was an invalid path = "' +
-            pathString +
-            '". Paths must be non-empty strings and ' +
-            'can\'t contain ".", "#", "$", "[", or "]"');
-};
-exports.validateRootPathString = function (fnName, argumentNumber, pathString, optional) {
-    if (pathString) {
-        // Allow '/.info/' at the beginning.
-        pathString = pathString.replace(/^\/*\.info(\/|$)/, '/');
-    }
-    exports.validatePathString(fnName, argumentNumber, pathString, optional);
-};
-exports.validateWritablePath = function (fnName, path) {
-    if (path.getFront() === '.info') {
-        throw new Error(fnName + " failed = Can't modify data under /.info/");
-    }
-};
-exports.validateUrl = function (fnName, argumentNumber, parsedUrl) {
-    // TODO = Validate server better.
-    var pathString = parsedUrl.path.toString();
-    if (!(typeof parsedUrl.repoInfo.host === 'string') ||
-        parsedUrl.repoInfo.host.length === 0 ||
-        (!exports.isValidKey(parsedUrl.repoInfo.namespace) &&
-            parsedUrl.repoInfo.host.split(':')[0] !== 'localhost') ||
-        (pathString.length !== 0 && !exports.isValidRootPathString(pathString))) {
-        throw new Error(util_3.errorPrefix(fnName, argumentNumber, false) +
-            'must be a valid firebase URL and ' +
-            'the path can\'t contain ".", "#", "$", "[", or "]".');
-    }
-};
-exports.validateCredential = function (fnName, argumentNumber, cred, optional) {
-    if (optional && cred === undefined)
-        return;
-    if (!(typeof cred === 'string'))
-        throw new Error(util_3.errorPrefix(fnName, argumentNumber, optional) +
-            'must be a valid credential (a string).');
-};
-exports.validateBoolean = function (fnName, argumentNumber, bool, optional) {
-    if (optional && bool === undefined)
-        return;
-    if (typeof bool !== 'boolean')
-        throw new Error(util_3.errorPrefix(fnName, argumentNumber, optional) + 'must be a boolean.');
-};
-exports.validateString = function (fnName, argumentNumber, string, optional) {
-    if (optional && string === undefined)
-        return;
-    if (!(typeof string === 'string')) {
-        throw new Error(util_3.errorPrefix(fnName, argumentNumber, optional) +
-            'must be a valid string.');
-    }
-};
-exports.validateObject = function (fnName, argumentNumber, obj, optional) {
-    if (optional && obj === undefined)
-        return;
-    if (!(obj && typeof obj === 'object') || obj === null) {
-        throw new Error(util_3.errorPrefix(fnName, argumentNumber, optional) +
-            'must be a valid object.');
-    }
-};
-exports.validateObjectContainsKey = function (fnName, argumentNumber, obj, key, optional, opt_type) {
-    var objectContainsKey = obj && typeof obj === 'object' && util_1.contains(obj, key);
-    if (!objectContainsKey) {
-        if (optional) {
-            return;
-        }
-        else {
-            throw new Error(util_3.errorPrefix(fnName, argumentNumber, optional) +
-                'must contain the key "' +
-                key +
-                '"');
-        }
-    }
-    if (opt_type) {
-        var val = util_1.safeGet(obj, key);
-        if ((opt_type === 'number' && !(typeof val === 'number')) ||
-            (opt_type === 'string' && !(typeof val === 'string')) ||
-            (opt_type === 'boolean' && !(typeof val === 'boolean')) ||
-            (opt_type === 'function' && !(typeof val === 'function')) ||
-            (opt_type === 'object' && !(typeof val === 'object') && val)) {
-            if (optional) {
-                throw new Error(util_3.errorPrefix(fnName, argumentNumber, optional) +
-                    'contains invalid value for key "' +
-                    key +
-                    '" (must be of type "' +
-                    opt_type +
-                    '")');
-            }
-            else {
-                throw new Error(util_3.errorPrefix(fnName, argumentNumber, optional) +
-                    'must contain the key "' +
-                    key +
-                    '" with type "' +
-                    opt_type +
-                    '"');
-            }
-        }
-    }
-};
-
-//# sourceMappingURL=validation.js.map
-
-
-/***/ }),
-/* 14 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-/**
- * Copyright 2017 Google Inc.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *   http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-Object.defineProperty(exports, "__esModule", { value: true });
-var util_1 = __webpack_require__(0);
-/**
- *
- * @enum
- */
-var OperationType;
-(function (OperationType) {
-    OperationType[OperationType["OVERWRITE"] = 0] = "OVERWRITE";
-    OperationType[OperationType["MERGE"] = 1] = "MERGE";
-    OperationType[OperationType["ACK_USER_WRITE"] = 2] = "ACK_USER_WRITE";
-    OperationType[OperationType["LISTEN_COMPLETE"] = 3] = "LISTEN_COMPLETE";
-})(OperationType = exports.OperationType || (exports.OperationType = {}));
-/**
- * @param {boolean} fromUser
- * @param {boolean} fromServer
- * @param {?string} queryId
- * @param {boolean} tagged
- * @constructor
- */
-var OperationSource = /** @class */ (function () {
-    function OperationSource(fromUser, fromServer, queryId, tagged) {
-        this.fromUser = fromUser;
-        this.fromServer = fromServer;
-        this.queryId = queryId;
-        this.tagged = tagged;
-        util_1.assert(!tagged || fromServer, 'Tagged queries must be from server.');
-    }
-    /**
-     * @const
-     * @type {!OperationSource}
-     */
-    OperationSource.User = new OperationSource(
-    /*fromUser=*/ true, false, null, 
-    /*tagged=*/ false);
-    /**
-     * @const
-     * @type {!OperationSource}
-     */
-    OperationSource.Server = new OperationSource(false, 
-    /*fromServer=*/ true, null, 
-    /*tagged=*/ false);
-    /**
-     * @param {string} queryId
-     * @return {!OperationSource}
-     */
-    OperationSource.forServerTaggedQuery = function (queryId) {
-        return new OperationSource(false, 
-        /*fromServer=*/ true, queryId, 
-        /*tagged=*/ true);
-    };
-    return OperationSource;
-}());
-exports.OperationSource = OperationSource;
-
-//# sourceMappingURL=Operation.js.map
-
-
-/***/ }),
-/* 15 */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-/**
- * Copyright 2017 Google Inc.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *   http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-
-var CODES = {
-    AVAILABLE_IN_WINDOW: 'only-available-in-window',
-    AVAILABLE_IN_SW: 'only-available-in-sw',
-    SHOULD_BE_INHERITED: 'should-be-overriden',
-    BAD_SENDER_ID: 'bad-sender-id',
-    INCORRECT_GCM_SENDER_ID: 'incorrect-gcm-sender-id',
-    PERMISSION_DEFAULT: 'permission-default',
-    PERMISSION_BLOCKED: 'permission-blocked',
-    UNSUPPORTED_BROWSER: 'unsupported-browser',
-    NOTIFICATIONS_BLOCKED: 'notifications-blocked',
-    FAILED_DEFAULT_REGISTRATION: 'failed-serviceworker-registration',
-    SW_REGISTRATION_EXPECTED: 'sw-registration-expected',
-    GET_SUBSCRIPTION_FAILED: 'get-subscription-failed',
-    INVALID_SAVED_TOKEN: 'invalid-saved-token',
-    SW_REG_REDUNDANT: 'sw-reg-redundant',
-    TOKEN_SUBSCRIBE_FAILED: 'token-subscribe-failed',
-    TOKEN_SUBSCRIBE_NO_TOKEN: 'token-subscribe-no-token',
-    TOKEN_SUBSCRIBE_NO_PUSH_SET: 'token-subscribe-no-push-set',
-    TOKEN_UNSUBSCRIBE_FAILED: 'token-unsubscribe-failed',
-    TOKEN_UPDATE_FAILED: 'token-update-failed',
-    TOKEN_UPDATE_NO_TOKEN: 'token-update-no-token',
-    USE_SW_BEFORE_GET_TOKEN: 'use-sw-before-get-token',
-    INVALID_DELETE_TOKEN: 'invalid-delete-token',
-    DELETE_TOKEN_NOT_FOUND: 'delete-token-not-found',
-    DELETE_SCOPE_NOT_FOUND: 'delete-scope-not-found',
-    BG_HANDLER_FUNCTION_EXPECTED: 'bg-handler-function-expected',
-    NO_WINDOW_CLIENT_TO_MSG: 'no-window-client-to-msg',
-    UNABLE_TO_RESUBSCRIBE: 'unable-to-resubscribe',
-    NO_FCM_TOKEN_FOR_RESUBSCRIBE: 'no-fcm-token-for-resubscribe',
-    FAILED_TO_DELETE_TOKEN: 'failed-to-delete-token',
-    NO_SW_IN_REG: 'no-sw-in-reg',
-    BAD_SCOPE: 'bad-scope',
-    BAD_VAPID_KEY: 'bad-vapid-key',
-    BAD_SUBSCRIPTION: 'bad-subscription',
-    BAD_TOKEN: 'bad-token',
-    BAD_PUSH_SET: 'bad-push-set',
-    FAILED_DELETE_VAPID_KEY: 'failed-delete-vapid-key',
-    INVALID_PUBLIC_VAPID_KEY: 'invalid-public-vapid-key',
-    USE_PUBLIC_KEY_BEFORE_GET_TOKEN: 'use-public-key-before-get-token',
-    PUBLIC_KEY_DECRYPTION_FAILED: 'public-vapid-key-decryption-failed'
-};
-var ERROR_MAP = (_a = {},
-    _a[CODES.AVAILABLE_IN_WINDOW] = 'This method is available in a Window context.',
-    _a[CODES.AVAILABLE_IN_SW] = 'This method is available in a service worker ' + 'context.',
-    _a[CODES.SHOULD_BE_INHERITED] = 'This method should be overriden by ' + 'extended classes.',
-    _a[CODES.BAD_SENDER_ID] = "Please ensure that 'messagingSenderId' is set " +
-        'correctly in the options passed into firebase.initializeApp().',
-    _a[CODES.PERMISSION_DEFAULT] = 'The required permissions were not granted and ' + 'dismissed instead.',
-    _a[CODES.PERMISSION_BLOCKED] = 'The required permissions were not granted and ' + 'blocked instead.',
-    _a[CODES.UNSUPPORTED_BROWSER] = "This browser doesn't support the API's " +
-        'required to use the firebase SDK.',
-    _a[CODES.NOTIFICATIONS_BLOCKED] = 'Notifications have been blocked.',
-    _a[CODES.FAILED_DEFAULT_REGISTRATION] = 'We are unable to register the ' +
-        'default service worker. {$browserErrorMessage}',
-    _a[CODES.SW_REGISTRATION_EXPECTED] = 'A service worker registration was the ' + 'expected input.',
-    _a[CODES.GET_SUBSCRIPTION_FAILED] = 'There was an error when trying to get ' +
-        'any existing Push Subscriptions.',
-    _a[CODES.INVALID_SAVED_TOKEN] = 'Unable to access details of the saved token.',
-    _a[CODES.SW_REG_REDUNDANT] = 'The service worker being used for push was made ' + 'redundant.',
-    _a[CODES.TOKEN_SUBSCRIBE_FAILED] = 'A problem occured while subscribing the ' + 'user to FCM: {$message}',
-    _a[CODES.TOKEN_SUBSCRIBE_NO_TOKEN] = 'FCM returned no token when subscribing ' + 'the user to push.',
-    _a[CODES.TOKEN_SUBSCRIBE_NO_PUSH_SET] = 'FCM returned an invalid response ' + 'when getting an FCM token.',
-    _a[CODES.TOKEN_UNSUBSCRIBE_FAILED] = 'A problem occured while unsubscribing the ' + 'user from FCM: {$message}',
-    _a[CODES.TOKEN_UPDATE_FAILED] = 'A problem occured while updating the ' + 'user from FCM: {$message}',
-    _a[CODES.TOKEN_UPDATE_NO_TOKEN] = 'FCM returned no token when updating ' + 'the user to push.',
-    _a[CODES.USE_SW_BEFORE_GET_TOKEN] = 'The useServiceWorker() method may only be called once and must be ' +
-        'called before calling getToken() to ensure your service worker is used.',
-    _a[CODES.INVALID_DELETE_TOKEN] = 'You must pass a valid token into ' +
-        'deleteToken(), i.e. the token from getToken().',
-    _a[CODES.DELETE_TOKEN_NOT_FOUND] = 'The deletion attempt for token could not ' +
-        'be performed as the token was not found.',
-    _a[CODES.DELETE_SCOPE_NOT_FOUND] = 'The deletion attempt for service worker ' +
-        'scope could not be performed as the scope was not found.',
-    _a[CODES.BG_HANDLER_FUNCTION_EXPECTED] = 'The input to ' + 'setBackgroundMessageHandler() must be a function.',
-    _a[CODES.NO_WINDOW_CLIENT_TO_MSG] = 'An attempt was made to message a ' + 'non-existant window client.',
-    _a[CODES.UNABLE_TO_RESUBSCRIBE] = 'There was an error while re-subscribing ' +
-        'the FCM token for push messaging. Will have to resubscribe the ' +
-        'user on next visit. {$message}',
-    _a[CODES.NO_FCM_TOKEN_FOR_RESUBSCRIBE] = 'Could not find an FCM token ' +
-        'and as a result, unable to resubscribe. Will have to resubscribe the ' +
-        'user on next visit.',
-    _a[CODES.FAILED_TO_DELETE_TOKEN] = 'Unable to delete the currently saved token.',
-    _a[CODES.NO_SW_IN_REG] = 'Even though the service worker registration was ' +
-        'successful, there was a problem accessing the service worker itself.',
-    _a[CODES.INCORRECT_GCM_SENDER_ID] = "Please change your web app manifest's " +
-        "'gcm_sender_id' value to '103953800507' to use Firebase messaging.",
-    _a[CODES.BAD_SCOPE] = 'The service worker scope must be a string with at ' +
-        'least one character.',
-    _a[CODES.BAD_VAPID_KEY] = 'The public VAPID key is not a Uint8Array with 65 bytes.',
-    _a[CODES.BAD_SUBSCRIPTION] = 'The subscription must be a valid ' + 'PushSubscription.',
-    _a[CODES.BAD_TOKEN] = 'The FCM Token used for storage / lookup was not ' +
-        'a valid token string.',
-    _a[CODES.BAD_PUSH_SET] = 'The FCM push set used for storage / lookup was not ' +
-        'not a valid push set string.',
-    _a[CODES.FAILED_DELETE_VAPID_KEY] = 'The VAPID key could not be deleted.',
-    _a[CODES.INVALID_PUBLIC_VAPID_KEY] = 'The public VAPID key must be a string.',
-    _a[CODES.PUBLIC_KEY_DECRYPTION_FAILED] = 'The public VAPID key did not equal ' + '65 bytes when decrypted.',
-    _a);
-/* harmony default export */ __webpack_exports__["a"] = ({
-    codes: CODES,
-    map: ERROR_MAP
-});
-var _a;
-
-//# sourceMappingURL=errors.js.map
-
-
-/***/ }),
-/* 16 */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-/* harmony export (immutable) */ __webpack_exports__["a"] = make;
-/* harmony export (immutable) */ __webpack_exports__["c"] = resolve;
-/* harmony export (immutable) */ __webpack_exports__["b"] = reject;
-/**
- * Copyright 2017 Google Inc.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *   http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-/**
- * @fileoverview Implements the promise abstraction interface for external
- * (public SDK) packaging, which just passes through to the firebase-app impl.
- */
-/**
- * @template T
- * @param {function((function(T): void),
- *                  (function(!Error): void))} resolver
- */
-function make(resolver) {
-    return new Promise(resolver);
-}
-/**
- * @template T
- */
-function resolve(value) {
-    return Promise.resolve(value);
-}
-function reject(error) {
-    return Promise.reject(error);
-}
-
-//# sourceMappingURL=promise_external.js.map
-
-
-/***/ }),
-/* 17 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
 exports.default = void 0;
 
 var _control = __webpack_require__(38);
@@ -5605,6 +4677,30 @@ function () {
         });
         (0, _jquery.default)("#kline_container").on('click', '#sizeIcon', function () {
           Kline.instance.isSized = !Kline.instance.isSized;
+          var chart_container_fullscreen = (0, _jquery.default)('#chart_container_fullscreen');
+          var chart_trade_quotation = (0, _jquery.default)('.chart_trade_quotation');
+          var chart_container = (0, _jquery.default)('.chart_container');
+          var trade_container = (0, _jquery.default)('.trade_container');
+
+          if (Kline.instance.isSized) {
+            trade_container.css('display', "none");
+            chart_container.appendTo(chart_container_fullscreen);
+
+            _control.Control.onSize(Kline.instance.height, Kline.instance.width);
+
+            chart_container_fullscreen.css('display', "block");
+            chart_trade_quotation.css('display', "none");
+          } else {
+            chart_trade_quotation.css('display', "block");
+            chart_container = chart_container.detach();
+            chart_trade_quotation.after(chart_container);
+            chart_container_fullscreen.css('display', "none");
+            trade_container.css('display', "block");
+
+            _control.Control.onSize(Kline.instance.width, Kline.instance.height);
+          }
+
+          return;
 
           if (Kline.instance.isSized) {
             (0, _jquery.default)(Kline.instance.element).css({
@@ -5673,6 +4769,953 @@ function () {
 exports.default = Kline;
 Kline.created = false;
 Kline.instance = null;
+
+/***/ }),
+/* 13 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.MainDataSource = exports.DataSource = void 0;
+
+var _named_object = __webpack_require__(9);
+
+var _ctool_manager = __webpack_require__(106);
+
+var _kline = _interopRequireDefault(__webpack_require__(12));
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+function _typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
+
+function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
+
+function _possibleConstructorReturn(self, call) { if (call && (_typeof(call) === "object" || typeof call === "function")) { return call; } return _assertThisInitialized(self); }
+
+function _assertThisInitialized(self) { if (self === void 0) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return self; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function"); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+var DataSource =
+/*#__PURE__*/
+function (_NamedObject) {
+  _inherits(DataSource, _NamedObject);
+
+  function DataSource(name) {
+    _classCallCheck(this, DataSource);
+
+    return _possibleConstructorReturn(this, (DataSource.__proto__ || Object.getPrototypeOf(DataSource)).call(this, name));
+  }
+
+  _createClass(DataSource, [{
+    key: "getUpdateMode",
+    value: function getUpdateMode() {
+      return this._updateMode;
+    }
+  }, {
+    key: "setUpdateMode",
+    value: function setUpdateMode(mode) {
+      this._updateMode = mode;
+    }
+  }, {
+    key: "getCacheSize",
+    value: function getCacheSize() {
+      return 0;
+    }
+  }, {
+    key: "getDataCount",
+    value: function getDataCount() {
+      return 0;
+    }
+  }, {
+    key: "getDataAt",
+    value: function getDataAt(index) {
+      return this._dataItems[index];
+    }
+  }]);
+
+  return DataSource;
+}(_named_object.NamedObject);
+
+exports.DataSource = DataSource;
+DataSource.UpdateMode = {
+  DoNothing: 0,
+  Refresh: 1,
+  Update: 2,
+  Append: 3
+};
+
+var MainDataSource =
+/*#__PURE__*/
+function (_DataSource) {
+  _inherits(MainDataSource, _DataSource);
+
+  function MainDataSource(name) {
+    var _this;
+
+    _classCallCheck(this, MainDataSource);
+
+    _this = _possibleConstructorReturn(this, (MainDataSource.__proto__ || Object.getPrototypeOf(MainDataSource)).call(this, name));
+    _this._erasedCount = 0;
+    _this._dataItems = [];
+    _this._decimalDigits = 0;
+    _this.toolManager = new _ctool_manager.CToolManager(name);
+    return _this;
+  }
+
+  _createClass(MainDataSource, [{
+    key: "getCacheSize",
+    value: function getCacheSize() {
+      return this._dataItems.length;
+    }
+  }, {
+    key: "getDataCount",
+    value: function getDataCount() {
+      return this._dataItems.length;
+    }
+  }, {
+    key: "getUpdatedCount",
+    value: function getUpdatedCount() {
+      return this._updatedCount;
+    }
+  }, {
+    key: "getAppendedCount",
+    value: function getAppendedCount() {
+      return this._appendedCount;
+    }
+  }, {
+    key: "getErasedCount",
+    value: function getErasedCount() {
+      return this._erasedCount;
+    }
+  }, {
+    key: "getDecimalDigits",
+    value: function getDecimalDigits() {
+      return this._decimalDigits;
+    }
+  }, {
+    key: "calcDecimalDigits",
+    value: function calcDecimalDigits(v) {
+      var str = "" + v;
+      var i = str.indexOf('.');
+
+      if (i < 0) {
+        return 0;
+      }
+
+      return str.length - 1 - i;
+    }
+  }, {
+    key: "getLastDate",
+    value: function getLastDate() {
+      var count = this.getDataCount();
+
+      if (count < 1) {
+        return -1;
+      }
+
+      return this.getDataAt(count - 1).date;
+    }
+  }, {
+    key: "getDataAt",
+    value: function getDataAt(index) {
+      return this._dataItems[index];
+    }
+  }, {
+    key: "update",
+    value: function update(data) {
+      this._updatedCount = 0;
+      this._appendedCount = 0;
+      this._erasedCount = 0;
+      var len = this._dataItems.length;
+
+      if (len > 0) {
+        var lastIndex = len - 1;
+        var lastItem = this._dataItems[lastIndex];
+
+        var _e,
+            _i,
+            _cnt = data.length;
+
+        for (_i = 0; _i < _cnt; _i++) {
+          _e = data[_i];
+
+          if (_e[0] === lastItem.date) {
+            if (lastItem.open === _e[1] && lastItem.high === _e[2] && lastItem.low === _e[3] && lastItem.close === _e[4] && lastItem.volume === _e[5]) {
+              this.setUpdateMode(DataSource.UpdateMode.DoNothing);
+            } else {
+              this.setUpdateMode(DataSource.UpdateMode.Update);
+              this._dataItems[lastIndex] = {
+                date: _e[0],
+                open: _e[1],
+                high: _e[2],
+                low: _e[3],
+                close: _e[4],
+                volume: _e[5]
+              };
+              this._updatedCount++;
+            }
+
+            _i++;
+
+            if (_i < _cnt) {
+              this.setUpdateMode(DataSource.UpdateMode.Append);
+
+              for (; _i < _cnt; _i++, this._appendedCount++) {
+                _e = data[_i];
+
+                this._dataItems.push({
+                  date: _e[0],
+                  open: _e[1],
+                  high: _e[2],
+                  low: _e[3],
+                  close: _e[4],
+                  volume: _e[5]
+                });
+              }
+            }
+
+            return true;
+          }
+        }
+
+        if (_cnt < _kline.default.instance.limit) {
+          this.setUpdateMode(DataSource.UpdateMode.DoNothing);
+          return false;
+        }
+      }
+
+      this.setUpdateMode(DataSource.UpdateMode.Refresh);
+      this._dataItems = [];
+      var d,
+          n,
+          e,
+          i,
+          cnt = data.length;
+
+      for (i = 0; i < cnt; i++) {
+        e = data[i];
+
+        for (n = 1; n <= 4; n++) {
+          d = this.calcDecimalDigits(e[n]);
+          if (this._decimalDigits < d) this._decimalDigits = d;
+        }
+
+        this._dataItems.push({
+          date: e[0],
+          open: e[1],
+          high: e[2],
+          low: e[3],
+          close: e[4],
+          volume: e[5]
+        });
+      }
+
+      return true;
+    }
+  }, {
+    key: "select",
+    value: function select(id) {
+      this.toolManager.selecedObject = id;
+    }
+  }, {
+    key: "unselect",
+    value: function unselect() {
+      this.toolManager.selecedObject = -1;
+    }
+  }, {
+    key: "addToolObject",
+    value: function addToolObject(toolObject) {
+      this.toolManager.addToolObject(toolObject);
+    }
+  }, {
+    key: "delToolObject",
+    value: function delToolObject() {
+      this.toolManager.delCurrentObject();
+    }
+  }, {
+    key: "getToolObject",
+    value: function getToolObject(index) {
+      return this.toolManager.getToolObject(index);
+    }
+  }, {
+    key: "getToolObjectCount",
+    value: function getToolObjectCount() {
+      return this.toolManager.toolObjects.length;
+    }
+  }, {
+    key: "getCurrentToolObject",
+    value: function getCurrentToolObject() {
+      return this.toolManager.getCurrentObject();
+    }
+  }, {
+    key: "getSelectToolObjcet",
+    value: function getSelectToolObjcet() {
+      return this.toolManager.getSelectedObject();
+    }
+  }, {
+    key: "delSelectToolObject",
+    value: function delSelectToolObject() {
+      this.toolManager.delSelectedObject();
+    }
+  }]);
+
+  return MainDataSource;
+}(DataSource);
+
+exports.MainDataSource = MainDataSource;
+
+/***/ }),
+/* 14 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+/**
+ * Copyright 2017 Google Inc.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+Object.defineProperty(exports, "__esModule", { value: true });
+var Path_1 = __webpack_require__(2);
+var util_1 = __webpack_require__(0);
+var util_2 = __webpack_require__(1);
+var util_3 = __webpack_require__(0);
+var util_4 = __webpack_require__(0);
+/**
+ * True for invalid Firebase keys
+ * @type {RegExp}
+ * @private
+ */
+exports.INVALID_KEY_REGEX_ = /[\[\].#$\/\u0000-\u001F\u007F]/;
+/**
+ * True for invalid Firebase paths.
+ * Allows '/' in paths.
+ * @type {RegExp}
+ * @private
+ */
+exports.INVALID_PATH_REGEX_ = /[\[\].#$\u0000-\u001F\u007F]/;
+/**
+ * Maximum number of characters to allow in leaf value
+ * @type {number}
+ * @private
+ */
+exports.MAX_LEAF_SIZE_ = 10 * 1024 * 1024;
+/**
+ * @param {*} key
+ * @return {boolean}
+ */
+exports.isValidKey = function (key) {
+    return (typeof key === 'string' && key.length !== 0 && !exports.INVALID_KEY_REGEX_.test(key));
+};
+/**
+ * @param {string} pathString
+ * @return {boolean}
+ */
+exports.isValidPathString = function (pathString) {
+    return (typeof pathString === 'string' &&
+        pathString.length !== 0 &&
+        !exports.INVALID_PATH_REGEX_.test(pathString));
+};
+/**
+ * @param {string} pathString
+ * @return {boolean}
+ */
+exports.isValidRootPathString = function (pathString) {
+    if (pathString) {
+        // Allow '/.info/' at the beginning.
+        pathString = pathString.replace(/^\/*\.info(\/|$)/, '/');
+    }
+    return exports.isValidPathString(pathString);
+};
+/**
+ * @param {*} priority
+ * @return {boolean}
+ */
+exports.isValidPriority = function (priority) {
+    return (priority === null ||
+        typeof priority === 'string' ||
+        (typeof priority === 'number' && !util_2.isInvalidJSONNumber(priority)) ||
+        (priority && typeof priority === 'object' && util_1.contains(priority, '.sv')));
+};
+/**
+ * Pre-validate a datum passed as an argument to Firebase function.
+ *
+ * @param {string} fnName
+ * @param {number} argumentNumber
+ * @param {*} data
+ * @param {!Path} path
+ * @param {boolean} optional
+ */
+exports.validateFirebaseDataArg = function (fnName, argumentNumber, data, path, optional) {
+    if (optional && data === undefined)
+        return;
+    exports.validateFirebaseData(util_3.errorPrefix(fnName, argumentNumber, optional), data, path);
+};
+/**
+ * Validate a data object client-side before sending to server.
+ *
+ * @param {string} errorPrefix
+ * @param {*} data
+ * @param {!Path|!ValidationPath} path_
+ */
+exports.validateFirebaseData = function (errorPrefix, data, path_) {
+    var path = path_ instanceof Path_1.Path ? new Path_1.ValidationPath(path_, errorPrefix) : path_;
+    if (data === undefined) {
+        throw new Error(errorPrefix + 'contains undefined ' + path.toErrorString());
+    }
+    if (typeof data === 'function') {
+        throw new Error(errorPrefix +
+            'contains a function ' +
+            path.toErrorString() +
+            ' with contents = ' +
+            data.toString());
+    }
+    if (util_2.isInvalidJSONNumber(data)) {
+        throw new Error(errorPrefix + 'contains ' + data.toString() + ' ' + path.toErrorString());
+    }
+    // Check max leaf size, but try to avoid the utf8 conversion if we can.
+    if (typeof data === 'string' &&
+        data.length > exports.MAX_LEAF_SIZE_ / 3 &&
+        util_4.stringLength(data) > exports.MAX_LEAF_SIZE_) {
+        throw new Error(errorPrefix +
+            'contains a string greater than ' +
+            exports.MAX_LEAF_SIZE_ +
+            ' utf8 bytes ' +
+            path.toErrorString() +
+            " ('" +
+            data.substring(0, 50) +
+            "...')");
+    }
+    // TODO = Perf = Consider combining the recursive validation of keys into NodeFromJSON
+    // to save extra walking of large objects.
+    if (data && typeof data === 'object') {
+        var hasDotValue_1 = false, hasActualChild_1 = false;
+        util_1.forEach(data, function (key, value) {
+            if (key === '.value') {
+                hasDotValue_1 = true;
+            }
+            else if (key !== '.priority' && key !== '.sv') {
+                hasActualChild_1 = true;
+                if (!exports.isValidKey(key)) {
+                    throw new Error(errorPrefix +
+                        ' contains an invalid key (' +
+                        key +
+                        ') ' +
+                        path.toErrorString() +
+                        '.  Keys must be non-empty strings ' +
+                        'and can\'t contain ".", "#", "$", "/", "[", or "]"');
+                }
+            }
+            path.push(key);
+            exports.validateFirebaseData(errorPrefix, value, path);
+            path.pop();
+        });
+        if (hasDotValue_1 && hasActualChild_1) {
+            throw new Error(errorPrefix +
+                ' contains ".value" child ' +
+                path.toErrorString() +
+                ' in addition to actual children.');
+        }
+    }
+};
+/**
+ * Pre-validate paths passed in the firebase function.
+ *
+ * @param {string} errorPrefix
+ * @param {Array<!Path>} mergePaths
+ */
+exports.validateFirebaseMergePaths = function (errorPrefix, mergePaths) {
+    var i, curPath;
+    for (i = 0; i < mergePaths.length; i++) {
+        curPath = mergePaths[i];
+        var keys = curPath.slice();
+        for (var j = 0; j < keys.length; j++) {
+            if (keys[j] === '.priority' && j === keys.length - 1) {
+                // .priority is OK
+            }
+            else if (!exports.isValidKey(keys[j])) {
+                throw new Error(errorPrefix +
+                    'contains an invalid key (' +
+                    keys[j] +
+                    ') in path ' +
+                    curPath.toString() +
+                    '. Keys must be non-empty strings ' +
+                    'and can\'t contain ".", "#", "$", "/", "[", or "]"');
+            }
+        }
+    }
+    // Check that update keys are not descendants of each other.
+    // We rely on the property that sorting guarantees that ancestors come
+    // right before descendants.
+    mergePaths.sort(Path_1.Path.comparePaths);
+    var prevPath = null;
+    for (i = 0; i < mergePaths.length; i++) {
+        curPath = mergePaths[i];
+        if (prevPath !== null && prevPath.contains(curPath)) {
+            throw new Error(errorPrefix +
+                'contains a path ' +
+                prevPath.toString() +
+                ' that is ancestor of another path ' +
+                curPath.toString());
+        }
+        prevPath = curPath;
+    }
+};
+/**
+ * pre-validate an object passed as an argument to firebase function (
+ * must be an object - e.g. for firebase.update()).
+ *
+ * @param {string} fnName
+ * @param {number} argumentNumber
+ * @param {*} data
+ * @param {!Path} path
+ * @param {boolean} optional
+ */
+exports.validateFirebaseMergeDataArg = function (fnName, argumentNumber, data, path, optional) {
+    if (optional && data === undefined)
+        return;
+    var errorPrefix = util_3.errorPrefix(fnName, argumentNumber, optional);
+    if (!(data && typeof data === 'object') || Array.isArray(data)) {
+        throw new Error(errorPrefix + ' must be an object containing the children to replace.');
+    }
+    var mergePaths = [];
+    util_1.forEach(data, function (key, value) {
+        var curPath = new Path_1.Path(key);
+        exports.validateFirebaseData(errorPrefix, value, path.child(curPath));
+        if (curPath.getBack() === '.priority') {
+            if (!exports.isValidPriority(value)) {
+                throw new Error(errorPrefix +
+                    "contains an invalid value for '" +
+                    curPath.toString() +
+                    "', which must be a valid " +
+                    'Firebase priority (a string, finite number, server value, or null).');
+            }
+        }
+        mergePaths.push(curPath);
+    });
+    exports.validateFirebaseMergePaths(errorPrefix, mergePaths);
+};
+exports.validatePriority = function (fnName, argumentNumber, priority, optional) {
+    if (optional && priority === undefined)
+        return;
+    if (util_2.isInvalidJSONNumber(priority))
+        throw new Error(util_3.errorPrefix(fnName, argumentNumber, optional) +
+            'is ' +
+            priority.toString() +
+            ', but must be a valid Firebase priority (a string, finite number, ' +
+            'server value, or null).');
+    // Special case to allow importing data with a .sv.
+    if (!exports.isValidPriority(priority))
+        throw new Error(util_3.errorPrefix(fnName, argumentNumber, optional) +
+            'must be a valid Firebase priority ' +
+            '(a string, finite number, server value, or null).');
+};
+exports.validateEventType = function (fnName, argumentNumber, eventType, optional) {
+    if (optional && eventType === undefined)
+        return;
+    switch (eventType) {
+        case 'value':
+        case 'child_added':
+        case 'child_removed':
+        case 'child_changed':
+        case 'child_moved':
+            break;
+        default:
+            throw new Error(util_3.errorPrefix(fnName, argumentNumber, optional) +
+                'must be a valid event type = "value", "child_added", "child_removed", ' +
+                '"child_changed", or "child_moved".');
+    }
+};
+exports.validateKey = function (fnName, argumentNumber, key, optional) {
+    if (optional && key === undefined)
+        return;
+    if (!exports.isValidKey(key))
+        throw new Error(util_3.errorPrefix(fnName, argumentNumber, optional) +
+            'was an invalid key = "' +
+            key +
+            '".  Firebase keys must be non-empty strings and ' +
+            'can\'t contain ".", "#", "$", "/", "[", or "]").');
+};
+exports.validatePathString = function (fnName, argumentNumber, pathString, optional) {
+    if (optional && pathString === undefined)
+        return;
+    if (!exports.isValidPathString(pathString))
+        throw new Error(util_3.errorPrefix(fnName, argumentNumber, optional) +
+            'was an invalid path = "' +
+            pathString +
+            '". Paths must be non-empty strings and ' +
+            'can\'t contain ".", "#", "$", "[", or "]"');
+};
+exports.validateRootPathString = function (fnName, argumentNumber, pathString, optional) {
+    if (pathString) {
+        // Allow '/.info/' at the beginning.
+        pathString = pathString.replace(/^\/*\.info(\/|$)/, '/');
+    }
+    exports.validatePathString(fnName, argumentNumber, pathString, optional);
+};
+exports.validateWritablePath = function (fnName, path) {
+    if (path.getFront() === '.info') {
+        throw new Error(fnName + " failed = Can't modify data under /.info/");
+    }
+};
+exports.validateUrl = function (fnName, argumentNumber, parsedUrl) {
+    // TODO = Validate server better.
+    var pathString = parsedUrl.path.toString();
+    if (!(typeof parsedUrl.repoInfo.host === 'string') ||
+        parsedUrl.repoInfo.host.length === 0 ||
+        (!exports.isValidKey(parsedUrl.repoInfo.namespace) &&
+            parsedUrl.repoInfo.host.split(':')[0] !== 'localhost') ||
+        (pathString.length !== 0 && !exports.isValidRootPathString(pathString))) {
+        throw new Error(util_3.errorPrefix(fnName, argumentNumber, false) +
+            'must be a valid firebase URL and ' +
+            'the path can\'t contain ".", "#", "$", "[", or "]".');
+    }
+};
+exports.validateCredential = function (fnName, argumentNumber, cred, optional) {
+    if (optional && cred === undefined)
+        return;
+    if (!(typeof cred === 'string'))
+        throw new Error(util_3.errorPrefix(fnName, argumentNumber, optional) +
+            'must be a valid credential (a string).');
+};
+exports.validateBoolean = function (fnName, argumentNumber, bool, optional) {
+    if (optional && bool === undefined)
+        return;
+    if (typeof bool !== 'boolean')
+        throw new Error(util_3.errorPrefix(fnName, argumentNumber, optional) + 'must be a boolean.');
+};
+exports.validateString = function (fnName, argumentNumber, string, optional) {
+    if (optional && string === undefined)
+        return;
+    if (!(typeof string === 'string')) {
+        throw new Error(util_3.errorPrefix(fnName, argumentNumber, optional) +
+            'must be a valid string.');
+    }
+};
+exports.validateObject = function (fnName, argumentNumber, obj, optional) {
+    if (optional && obj === undefined)
+        return;
+    if (!(obj && typeof obj === 'object') || obj === null) {
+        throw new Error(util_3.errorPrefix(fnName, argumentNumber, optional) +
+            'must be a valid object.');
+    }
+};
+exports.validateObjectContainsKey = function (fnName, argumentNumber, obj, key, optional, opt_type) {
+    var objectContainsKey = obj && typeof obj === 'object' && util_1.contains(obj, key);
+    if (!objectContainsKey) {
+        if (optional) {
+            return;
+        }
+        else {
+            throw new Error(util_3.errorPrefix(fnName, argumentNumber, optional) +
+                'must contain the key "' +
+                key +
+                '"');
+        }
+    }
+    if (opt_type) {
+        var val = util_1.safeGet(obj, key);
+        if ((opt_type === 'number' && !(typeof val === 'number')) ||
+            (opt_type === 'string' && !(typeof val === 'string')) ||
+            (opt_type === 'boolean' && !(typeof val === 'boolean')) ||
+            (opt_type === 'function' && !(typeof val === 'function')) ||
+            (opt_type === 'object' && !(typeof val === 'object') && val)) {
+            if (optional) {
+                throw new Error(util_3.errorPrefix(fnName, argumentNumber, optional) +
+                    'contains invalid value for key "' +
+                    key +
+                    '" (must be of type "' +
+                    opt_type +
+                    '")');
+            }
+            else {
+                throw new Error(util_3.errorPrefix(fnName, argumentNumber, optional) +
+                    'must contain the key "' +
+                    key +
+                    '" with type "' +
+                    opt_type +
+                    '"');
+            }
+        }
+    }
+};
+
+//# sourceMappingURL=validation.js.map
+
+
+/***/ }),
+/* 15 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+/**
+ * Copyright 2017 Google Inc.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+Object.defineProperty(exports, "__esModule", { value: true });
+var util_1 = __webpack_require__(0);
+/**
+ *
+ * @enum
+ */
+var OperationType;
+(function (OperationType) {
+    OperationType[OperationType["OVERWRITE"] = 0] = "OVERWRITE";
+    OperationType[OperationType["MERGE"] = 1] = "MERGE";
+    OperationType[OperationType["ACK_USER_WRITE"] = 2] = "ACK_USER_WRITE";
+    OperationType[OperationType["LISTEN_COMPLETE"] = 3] = "LISTEN_COMPLETE";
+})(OperationType = exports.OperationType || (exports.OperationType = {}));
+/**
+ * @param {boolean} fromUser
+ * @param {boolean} fromServer
+ * @param {?string} queryId
+ * @param {boolean} tagged
+ * @constructor
+ */
+var OperationSource = /** @class */ (function () {
+    function OperationSource(fromUser, fromServer, queryId, tagged) {
+        this.fromUser = fromUser;
+        this.fromServer = fromServer;
+        this.queryId = queryId;
+        this.tagged = tagged;
+        util_1.assert(!tagged || fromServer, 'Tagged queries must be from server.');
+    }
+    /**
+     * @const
+     * @type {!OperationSource}
+     */
+    OperationSource.User = new OperationSource(
+    /*fromUser=*/ true, false, null, 
+    /*tagged=*/ false);
+    /**
+     * @const
+     * @type {!OperationSource}
+     */
+    OperationSource.Server = new OperationSource(false, 
+    /*fromServer=*/ true, null, 
+    /*tagged=*/ false);
+    /**
+     * @param {string} queryId
+     * @return {!OperationSource}
+     */
+    OperationSource.forServerTaggedQuery = function (queryId) {
+        return new OperationSource(false, 
+        /*fromServer=*/ true, queryId, 
+        /*tagged=*/ true);
+    };
+    return OperationSource;
+}());
+exports.OperationSource = OperationSource;
+
+//# sourceMappingURL=Operation.js.map
+
+
+/***/ }),
+/* 16 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/**
+ * Copyright 2017 Google Inc.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+var CODES = {
+    AVAILABLE_IN_WINDOW: 'only-available-in-window',
+    AVAILABLE_IN_SW: 'only-available-in-sw',
+    SHOULD_BE_INHERITED: 'should-be-overriden',
+    BAD_SENDER_ID: 'bad-sender-id',
+    INCORRECT_GCM_SENDER_ID: 'incorrect-gcm-sender-id',
+    PERMISSION_DEFAULT: 'permission-default',
+    PERMISSION_BLOCKED: 'permission-blocked',
+    UNSUPPORTED_BROWSER: 'unsupported-browser',
+    NOTIFICATIONS_BLOCKED: 'notifications-blocked',
+    FAILED_DEFAULT_REGISTRATION: 'failed-serviceworker-registration',
+    SW_REGISTRATION_EXPECTED: 'sw-registration-expected',
+    GET_SUBSCRIPTION_FAILED: 'get-subscription-failed',
+    INVALID_SAVED_TOKEN: 'invalid-saved-token',
+    SW_REG_REDUNDANT: 'sw-reg-redundant',
+    TOKEN_SUBSCRIBE_FAILED: 'token-subscribe-failed',
+    TOKEN_SUBSCRIBE_NO_TOKEN: 'token-subscribe-no-token',
+    TOKEN_SUBSCRIBE_NO_PUSH_SET: 'token-subscribe-no-push-set',
+    TOKEN_UNSUBSCRIBE_FAILED: 'token-unsubscribe-failed',
+    TOKEN_UPDATE_FAILED: 'token-update-failed',
+    TOKEN_UPDATE_NO_TOKEN: 'token-update-no-token',
+    USE_SW_BEFORE_GET_TOKEN: 'use-sw-before-get-token',
+    INVALID_DELETE_TOKEN: 'invalid-delete-token',
+    DELETE_TOKEN_NOT_FOUND: 'delete-token-not-found',
+    DELETE_SCOPE_NOT_FOUND: 'delete-scope-not-found',
+    BG_HANDLER_FUNCTION_EXPECTED: 'bg-handler-function-expected',
+    NO_WINDOW_CLIENT_TO_MSG: 'no-window-client-to-msg',
+    UNABLE_TO_RESUBSCRIBE: 'unable-to-resubscribe',
+    NO_FCM_TOKEN_FOR_RESUBSCRIBE: 'no-fcm-token-for-resubscribe',
+    FAILED_TO_DELETE_TOKEN: 'failed-to-delete-token',
+    NO_SW_IN_REG: 'no-sw-in-reg',
+    BAD_SCOPE: 'bad-scope',
+    BAD_VAPID_KEY: 'bad-vapid-key',
+    BAD_SUBSCRIPTION: 'bad-subscription',
+    BAD_TOKEN: 'bad-token',
+    BAD_PUSH_SET: 'bad-push-set',
+    FAILED_DELETE_VAPID_KEY: 'failed-delete-vapid-key',
+    INVALID_PUBLIC_VAPID_KEY: 'invalid-public-vapid-key',
+    USE_PUBLIC_KEY_BEFORE_GET_TOKEN: 'use-public-key-before-get-token',
+    PUBLIC_KEY_DECRYPTION_FAILED: 'public-vapid-key-decryption-failed'
+};
+var ERROR_MAP = (_a = {},
+    _a[CODES.AVAILABLE_IN_WINDOW] = 'This method is available in a Window context.',
+    _a[CODES.AVAILABLE_IN_SW] = 'This method is available in a service worker ' + 'context.',
+    _a[CODES.SHOULD_BE_INHERITED] = 'This method should be overriden by ' + 'extended classes.',
+    _a[CODES.BAD_SENDER_ID] = "Please ensure that 'messagingSenderId' is set " +
+        'correctly in the options passed into firebase.initializeApp().',
+    _a[CODES.PERMISSION_DEFAULT] = 'The required permissions were not granted and ' + 'dismissed instead.',
+    _a[CODES.PERMISSION_BLOCKED] = 'The required permissions were not granted and ' + 'blocked instead.',
+    _a[CODES.UNSUPPORTED_BROWSER] = "This browser doesn't support the API's " +
+        'required to use the firebase SDK.',
+    _a[CODES.NOTIFICATIONS_BLOCKED] = 'Notifications have been blocked.',
+    _a[CODES.FAILED_DEFAULT_REGISTRATION] = 'We are unable to register the ' +
+        'default service worker. {$browserErrorMessage}',
+    _a[CODES.SW_REGISTRATION_EXPECTED] = 'A service worker registration was the ' + 'expected input.',
+    _a[CODES.GET_SUBSCRIPTION_FAILED] = 'There was an error when trying to get ' +
+        'any existing Push Subscriptions.',
+    _a[CODES.INVALID_SAVED_TOKEN] = 'Unable to access details of the saved token.',
+    _a[CODES.SW_REG_REDUNDANT] = 'The service worker being used for push was made ' + 'redundant.',
+    _a[CODES.TOKEN_SUBSCRIBE_FAILED] = 'A problem occured while subscribing the ' + 'user to FCM: {$message}',
+    _a[CODES.TOKEN_SUBSCRIBE_NO_TOKEN] = 'FCM returned no token when subscribing ' + 'the user to push.',
+    _a[CODES.TOKEN_SUBSCRIBE_NO_PUSH_SET] = 'FCM returned an invalid response ' + 'when getting an FCM token.',
+    _a[CODES.TOKEN_UNSUBSCRIBE_FAILED] = 'A problem occured while unsubscribing the ' + 'user from FCM: {$message}',
+    _a[CODES.TOKEN_UPDATE_FAILED] = 'A problem occured while updating the ' + 'user from FCM: {$message}',
+    _a[CODES.TOKEN_UPDATE_NO_TOKEN] = 'FCM returned no token when updating ' + 'the user to push.',
+    _a[CODES.USE_SW_BEFORE_GET_TOKEN] = 'The useServiceWorker() method may only be called once and must be ' +
+        'called before calling getToken() to ensure your service worker is used.',
+    _a[CODES.INVALID_DELETE_TOKEN] = 'You must pass a valid token into ' +
+        'deleteToken(), i.e. the token from getToken().',
+    _a[CODES.DELETE_TOKEN_NOT_FOUND] = 'The deletion attempt for token could not ' +
+        'be performed as the token was not found.',
+    _a[CODES.DELETE_SCOPE_NOT_FOUND] = 'The deletion attempt for service worker ' +
+        'scope could not be performed as the scope was not found.',
+    _a[CODES.BG_HANDLER_FUNCTION_EXPECTED] = 'The input to ' + 'setBackgroundMessageHandler() must be a function.',
+    _a[CODES.NO_WINDOW_CLIENT_TO_MSG] = 'An attempt was made to message a ' + 'non-existant window client.',
+    _a[CODES.UNABLE_TO_RESUBSCRIBE] = 'There was an error while re-subscribing ' +
+        'the FCM token for push messaging. Will have to resubscribe the ' +
+        'user on next visit. {$message}',
+    _a[CODES.NO_FCM_TOKEN_FOR_RESUBSCRIBE] = 'Could not find an FCM token ' +
+        'and as a result, unable to resubscribe. Will have to resubscribe the ' +
+        'user on next visit.',
+    _a[CODES.FAILED_TO_DELETE_TOKEN] = 'Unable to delete the currently saved token.',
+    _a[CODES.NO_SW_IN_REG] = 'Even though the service worker registration was ' +
+        'successful, there was a problem accessing the service worker itself.',
+    _a[CODES.INCORRECT_GCM_SENDER_ID] = "Please change your web app manifest's " +
+        "'gcm_sender_id' value to '103953800507' to use Firebase messaging.",
+    _a[CODES.BAD_SCOPE] = 'The service worker scope must be a string with at ' +
+        'least one character.',
+    _a[CODES.BAD_VAPID_KEY] = 'The public VAPID key is not a Uint8Array with 65 bytes.',
+    _a[CODES.BAD_SUBSCRIPTION] = 'The subscription must be a valid ' + 'PushSubscription.',
+    _a[CODES.BAD_TOKEN] = 'The FCM Token used for storage / lookup was not ' +
+        'a valid token string.',
+    _a[CODES.BAD_PUSH_SET] = 'The FCM push set used for storage / lookup was not ' +
+        'not a valid push set string.',
+    _a[CODES.FAILED_DELETE_VAPID_KEY] = 'The VAPID key could not be deleted.',
+    _a[CODES.INVALID_PUBLIC_VAPID_KEY] = 'The public VAPID key must be a string.',
+    _a[CODES.PUBLIC_KEY_DECRYPTION_FAILED] = 'The public VAPID key did not equal ' + '65 bytes when decrypted.',
+    _a);
+/* harmony default export */ __webpack_exports__["a"] = ({
+    codes: CODES,
+    map: ERROR_MAP
+});
+var _a;
+
+//# sourceMappingURL=errors.js.map
+
+
+/***/ }),
+/* 17 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony export (immutable) */ __webpack_exports__["a"] = make;
+/* harmony export (immutable) */ __webpack_exports__["c"] = resolve;
+/* harmony export (immutable) */ __webpack_exports__["b"] = reject;
+/**
+ * Copyright 2017 Google Inc.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+/**
+ * @fileoverview Implements the promise abstraction interface for external
+ * (public SDK) packaging, which just passes through to the firebase-app impl.
+ */
+/**
+ * @template T
+ * @param {function((function(T): void),
+ *                  (function(!Error): void))} resolver
+ */
+function make(resolver) {
+    return new Promise(resolver);
+}
+/**
+ * @template T
+ */
+function resolve(value) {
+    return Promise.resolve(value);
+}
+function reject(error) {
+    return Promise.reject(error);
+}
+
+//# sourceMappingURL=promise_external.js.map
+
 
 /***/ }),
 /* 18 */
@@ -6019,7 +6062,7 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports.LightTheme = exports.DarkTheme = exports.Theme = void 0;
 
-var _kline = _interopRequireDefault(__webpack_require__(17));
+var _kline = _interopRequireDefault(__webpack_require__(12));
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -6732,7 +6775,7 @@ var _chart_manager = __webpack_require__(4);
 
 var _chart_settings = __webpack_require__(20);
 
-var data_sources = _interopRequireWildcard(__webpack_require__(12));
+var data_sources = _interopRequireWildcard(__webpack_require__(13));
 
 var data_providers = _interopRequireWildcard(__webpack_require__(42));
 
@@ -8960,7 +9003,7 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports.Control = void 0;
 
-var _kline = _interopRequireDefault(__webpack_require__(17));
+var _kline = _interopRequireDefault(__webpack_require__(12));
 
 var _kline_trade = __webpack_require__(57);
 
@@ -9668,195 +9711,279 @@ function () {
       //modify 右侧的行情面板
 
       var height = h || window.innerHeight;
-      var remainHeight = height;
+      var remainHeight = height; //modify
 
-      if (_kline.default.instance.showTrade && !isNaN(_kline.default.instance.tradeHeight)) {
-        remainHeight -= _kline.default.instance.tradeHeight;
-      }
-
-      var container = (0, _jquery.default)(_kline.default.instance.element);
-      container.css({
-        width: width + 'px',
-        height: height + 'px'
-      });
-      var toolBar = (0, _jquery.default)('#chart_toolbar');
-      var toolPanel = (0, _jquery.default)('#chart_toolpanel');
-      var canvasGroup = (0, _jquery.default)('#chart_canvasGroup');
-      var tabBar = (0, _jquery.default)('#chart_tabbar');
-      var toolPanelShown = toolPanel[0].style.display !== 'inline' ? false : true;
-      var tabBarShown = tabBar[0].style.display !== 'block' ? false : true;
-      var toolBarRect = {};
-      toolBarRect.x = 0;
-      toolBarRect.y = 0;
-      toolBarRect.w = chartWidth;
-      toolBarRect.h = 29;
-      var toolPanelRect = {};
-      toolPanelRect.x = 0;
-      toolPanelRect.y = toolBarRect.h + 1;
-      toolPanelRect.w = toolPanelShown ? 32 : 0;
-      toolPanelRect.h = remainHeight - toolPanelRect.y;
-      var tabBarRect = {};
-      tabBarRect.w = toolPanelShown ? chartWidth - (toolPanelRect.w + 1) : chartWidth;
-      tabBarRect.h = tabBarShown ? 22 : -1;
-      tabBarRect.x = chartWidth - tabBarRect.w;
-      tabBarRect.y = remainHeight - (tabBarRect.h + 1);
-      var canvasGroupRect = {};
-      canvasGroupRect.x = tabBarRect.x;
-      canvasGroupRect.y = toolPanelRect.y;
-      canvasGroupRect.w = tabBarRect.w;
-      canvasGroupRect.h = tabBarRect.y - toolPanelRect.y;
-      toolBar.css({
-        left: toolBarRect.x + 'px',
-        top: toolBarRect.y + 'px',
-        width: toolBarRect.w + 'px',
-        height: toolBarRect.h + 'px'
-      });
-
-      if (toolPanelShown) {
-        toolPanel.css({
-          left: toolPanelRect.x + 'px',
-          top: toolPanelRect.y + 'px',
-          width: toolPanelRect.w + 'px',
-          height: toolPanelRect.h + 'px'
-        });
-      }
-
-      canvasGroup.css({
-        left: canvasGroupRect.x + 'px',
-        top: canvasGroupRect.y + 'px',
-        width: canvasGroupRect.w + 'px',
-        height: canvasGroupRect.h + 'px'
-      });
-      var mainCanvas = (0, _jquery.default)('#chart_mainCanvas')[0];
-      var overlayCanvas = (0, _jquery.default)('#chart_overlayCanvas')[0];
-      var devicePixelRatio = window.devicePixelRatio;
-      var context = mainCanvas.getContext("2d");
-      var backingStoreRatio = context.webkitBackingStorePixelRatio || context.mozBackingStorePixelRatio || context.msBackingStorePixelRatio || context.oBackingStorePixelRatio || context.backingStorePixelRatio || 1;
-      var ratio = devicePixelRatio / backingStoreRatio;
-      _kline.default.instance.deviceRatio = ratio;
-      mainCanvas.width = canvasGroupRect.w * ratio;
-      mainCanvas.height = canvasGroupRect.h * ratio;
-      overlayCanvas.width = canvasGroupRect.w * ratio;
-      ;
-      overlayCanvas.height = canvasGroupRect.h * ratio;
-      ;
-      mainCanvas.style.width = canvasGroupRect.w + 'px';
-      mainCanvas.style.height = canvasGroupRect.h + "px";
-      overlayCanvas.style.width = canvasGroupRect.w + 'px';
-      overlayCanvas.style.height = canvasGroupRect.h + 'px';
-
-      if (tabBarShown) {
-        tabBar.css({
-          left: tabBarRect.x + 'px',
-          top: tabBarRect.y + 'px',
-          width: tabBarRect.w + 'px',
-          height: tabBarRect.h + 'px'
-        });
-      }
-
-      var dlgSettings = (0, _jquery.default)("#chart_parameter_settings");
-      dlgSettings.css({
-        left: chartWidth - dlgSettings.width() >> 1,
-        top: height - dlgSettings.height() >> 1,
-        display: 'none'
-      });
-      var dlgLoading = (0, _jquery.default)("#chart_loading");
-      dlgLoading.css({
-        left: chartWidth - dlgLoading.width() >> 1,
-        top: height - dlgLoading.height() >> 2
-      });
-      var domElemCache = (0, _jquery.default)('#chart_dom_elem_cache');
-      var rowTheme = (0, _jquery.default)('#chart_select_theme')[0];
-      var rowTools = (0, _jquery.default)('#chart_enable_tools')[0];
-      var rowIndic = (0, _jquery.default)('#chart_enable_indicator')[0]; // modify
-
-      var periodsVert = (0, _jquery.default)('#chart_toolbar_periods_vert'); //周期
-
-      var periodsHorz = (0, _jquery.default)('#chart_toolbar_periods_horz')[0]; // 分时 5 分钟
-
-      var mainIndicator = (0, _jquery.default)('#chart_main_indicator')[0]; //指标
-
-      var sizeIcon = (0, _jquery.default)('#chart_updated_time')[0];
-      var chatPeriodToolRanages = []; // 根据时间计算显示个数
-
-      var ranges = _kline.default.instance.ranges;
-      var periodShowWidth = chartWidth - mainIndicator.offsetWidth - 4 - periodsVert[0].offsetWidth - sizeIcon.offsetWidth;
-      var totalCount = ranges.length;
-      var showCount = totalCount;
-      var totalWidth = 0;
-
-      for (var i = 0; i < totalCount; i++) {
-        var dom = (0, _jquery.default)('#chart_period_' + ranges[i] + '_h');
-        dom.show();
-        totalWidth += dom.width();
-
-        if (totalWidth > periodShowWidth - periodsVert.width()) {
-          dom.hide();
-          showCount--;
-        } else {
-          chatPeriodToolRanages.push(ranges[i]);
+      if (w < h) {
+        if (_kline.default.instance.showTrade && !isNaN(_kline.default.instance.tradeHeight)) {
+          remainHeight -= _kline.default.instance.tradeHeight;
         }
+
+        var container = (0, _jquery.default)(_kline.default.instance.element);
+        container.css({
+          width: width + 'px',
+          height: height + 'px'
+        }); // modify add
+
+        var chart_trade_quotation = (0, _jquery.default)('.chart_trade_quotation');
+        chart_trade_quotation.css({
+          height: '86px',
+          backgroundColor: '#0a0a0a',
+          position: 'relative'
+        }); // modify 
+
+        var toolBar = (0, _jquery.default)('#chart_toolbar');
+        toolBar.show();
+        var toolPanel = (0, _jquery.default)('#chart_toolpanel');
+        var canvasGroup = (0, _jquery.default)('#chart_canvasGroup');
+        var tabBar = (0, _jquery.default)('#chart_tabbar');
+        tabBar.show();
+        var toolPanelShown = toolPanel[0].style.display !== 'inline' ? false : true;
+        var tabBarShown = tabBar[0].style.display !== 'block' ? false : true;
+        var toolBarRect = {};
+        toolBarRect.x = 0;
+        toolBarRect.y = 0;
+        toolBarRect.w = chartWidth;
+        toolBarRect.h = 29;
+        var toolPanelRect = {};
+        toolPanelRect.x = 0;
+        toolPanelRect.y = toolBarRect.h + 1;
+        toolPanelRect.w = toolPanelShown ? 32 : 0;
+        toolPanelRect.h = remainHeight - toolPanelRect.y;
+        var tabBarRect = {};
+        tabBarRect.w = toolPanelShown ? chartWidth - (toolPanelRect.w + 1) : chartWidth;
+        tabBarRect.h = tabBarShown ? 22 : -1;
+        tabBarRect.x = chartWidth - tabBarRect.w;
+        tabBarRect.y = remainHeight - (tabBarRect.h + 1);
+        var canvasGroupRect = {};
+        canvasGroupRect.x = tabBarRect.x;
+        canvasGroupRect.y = toolPanelRect.y;
+        canvasGroupRect.w = tabBarRect.w;
+        canvasGroupRect.h = tabBarRect.y - toolPanelRect.y;
+        toolBar.css({
+          left: toolBarRect.x + 'px',
+          top: toolBarRect.y + 'px',
+          width: toolBarRect.w + 'px',
+          height: toolBarRect.h + 'px'
+        });
+
+        if (toolPanelShown) {
+          toolPanel.css({
+            left: toolPanelRect.x + 'px',
+            top: toolPanelRect.y + 'px',
+            width: toolPanelRect.w + 'px',
+            height: toolPanelRect.h + 'px'
+          });
+        }
+
+        canvasGroup.css({
+          left: canvasGroupRect.x + 'px',
+          top: canvasGroupRect.y + 'px',
+          width: canvasGroupRect.w + 'px',
+          height: canvasGroupRect.h + 'px'
+        });
+        var mainCanvas = (0, _jquery.default)('#chart_mainCanvas')[0];
+        var overlayCanvas = (0, _jquery.default)('#chart_overlayCanvas')[0];
+        var devicePixelRatio = window.devicePixelRatio;
+        var context = mainCanvas.getContext("2d");
+        var backingStoreRatio = context.webkitBackingStorePixelRatio || context.mozBackingStorePixelRatio || context.msBackingStorePixelRatio || context.oBackingStorePixelRatio || context.backingStorePixelRatio || 1;
+        var ratio = devicePixelRatio / backingStoreRatio;
+        _kline.default.instance.deviceRatio = ratio;
+        mainCanvas.width = canvasGroupRect.w * ratio;
+        mainCanvas.height = canvasGroupRect.h * ratio;
+        overlayCanvas.width = canvasGroupRect.w * ratio;
+        ;
+        overlayCanvas.height = canvasGroupRect.h * ratio;
+        ;
+        mainCanvas.style.width = canvasGroupRect.w + 'px';
+        mainCanvas.style.height = canvasGroupRect.h + "px";
+        overlayCanvas.style.width = canvasGroupRect.w + 'px';
+        overlayCanvas.style.height = canvasGroupRect.h + 'px';
+
+        if (tabBarShown) {
+          tabBar.css({
+            left: tabBarRect.x + 'px',
+            top: tabBarRect.y + 'px',
+            width: tabBarRect.w + 'px',
+            height: tabBarRect.h + 'px'
+          });
+        }
+
+        var dlgSettings = (0, _jquery.default)("#chart_parameter_settings");
+        dlgSettings.css({
+          left: chartWidth - dlgSettings.width() >> 1,
+          top: height - dlgSettings.height() >> 1,
+          display: 'none'
+        });
+        var dlgLoading = (0, _jquery.default)("#chart_loading");
+        dlgLoading.css({
+          left: chartWidth - dlgLoading.width() >> 1,
+          top: height - dlgLoading.height() >> 2
+        });
+        var domElemCache = (0, _jquery.default)('#chart_dom_elem_cache');
+        var rowTheme = (0, _jquery.default)('#chart_select_theme')[0];
+        var rowTools = (0, _jquery.default)('#chart_enable_tools')[0];
+        var rowIndic = (0, _jquery.default)('#chart_enable_indicator')[0]; // modify
+
+        var periodsVert = (0, _jquery.default)('#chart_toolbar_periods_vert'); //周期
+
+        var periodsHorz = (0, _jquery.default)('#chart_toolbar_periods_horz')[0]; // 分时 5 分钟
+
+        var mainIndicator = (0, _jquery.default)('#chart_main_indicator')[0]; //指标
+
+        var sizeIcon = (0, _jquery.default)('#chart_updated_time')[0];
+        var chatPeriodToolRanages = []; // 根据时间计算显示个数
+
+        var ranges = _kline.default.instance.ranges;
+        var periodShowWidth = chartWidth - mainIndicator.offsetWidth - 4 - periodsVert[0].offsetWidth - sizeIcon.offsetWidth;
+        var totalCount = ranges.length;
+        var showCount = totalCount;
+        var totalWidth = 0;
+
+        for (var i = 0; i < totalCount; i++) {
+          var dom = (0, _jquery.default)('#chart_period_' + ranges[i] + '_h');
+          dom.show();
+          totalWidth += dom.width();
+
+          if (totalWidth > periodShowWidth - periodsVert.width()) {
+            dom.hide();
+            showCount--;
+          } else {
+            chatPeriodToolRanages.push(ranges[i]);
+          }
+        }
+
+        if (showCount < ranges.length) {
+          periodsVert.show();
+
+          _kline.default.instance.periodsVertDisplayNone(chatPeriodToolRanages);
+        } else {
+          periodsVert.hide();
+        } /////
+
+
+        var showIndic = (0, _jquery.default)('#chart_show_indicator')[0];
+        var showTools = (0, _jquery.default)('#chart_show_tools')[0];
+        var selectTheme = (0, _jquery.default)('#chart_toolbar_theme')[0];
+        var dropDownSettings = (0, _jquery.default)('#chart_dropdown_settings');
+        dropDownSettings.css('display', "none");
+        (0, _jquery.default)("#chart_language_setting_div").css('display', "none");
+        var periodsVertNW = periodsVert[0].offsetWidth;
+        var periodsHorzNW = periodsVertNW + periodsHorz.offsetWidth;
+        var showIndicNW = periodsHorzNW + showIndic.offsetWidth + 4;
+        var showToolsNW = showIndicNW + showTools.offsetWidth + 4;
+        var selectThemeNW = showToolsNW + selectTheme.offsetWidth;
+        var dropDownSettingsW = dropDownSettings.find(".chart_dropdown_t")[0].offsetWidth + 150;
+        periodsVertNW += dropDownSettingsW;
+        periodsHorzNW += dropDownSettingsW;
+        showIndicNW += dropDownSettingsW;
+        showToolsNW += dropDownSettingsW;
+        selectThemeNW += dropDownSettingsW; // if (chartWidth < periodsHorzNW) {
+        //     domElemCache.append(periodsHorz);
+        // } else {
+        //     periodsVert.after(periodsHorz);
+        // }
+
+        if (chartWidth < showIndicNW) {
+          domElemCache.append(showIndic);
+          rowIndic.style.display = "";
+        } else {
+          dropDownSettings.before(showIndic);
+          rowIndic.style.display = "none";
+        }
+
+        if (chartWidth < showToolsNW) {
+          domElemCache.append(showTools);
+          rowTools.style.display = "";
+        } else {
+          dropDownSettings.before(showTools);
+          rowTools.style.display = "none";
+        }
+
+        if (chartWidth < selectThemeNW) {
+          domElemCache.append(selectTheme);
+          rowTheme.style.display = "";
+        } else {
+          dropDownSettings.before(selectTheme);
+          rowTheme.style.display = "none";
+        }
+      } else {
+        var portraitWidth = height;
+        var portraitHeight = width;
+
+        var _container = (0, _jquery.default)(_kline.default.instance.element);
+
+        _container.css({
+          width: portraitWidth + 'px',
+          height: portraitHeight + 'px'
+        });
+
+        var topSidebar = 38,
+            bottomSidebar = 38;
+        var portraitRemainWidth = portraitWidth - topSidebar - bottomSidebar;
+
+        var _toolBar = (0, _jquery.default)('#chart_toolbar');
+
+        var _toolPanel = (0, _jquery.default)('#chart_toolpanel');
+
+        _toolBar.hide();
+
+        var _canvasGroup = (0, _jquery.default)('#chart_canvasGroup');
+
+        var _tabBar = (0, _jquery.default)('#chart_tabbar');
+
+        _tabBar.hide();
+
+        var _canvasGroupRect = {};
+        _canvasGroupRect.x = 0;
+        _canvasGroupRect.y = 0;
+        _canvasGroupRect.w = 414;
+        _canvasGroupRect.h = portraitHeight;
+
+        _canvasGroup.css({
+          left: _canvasGroupRect.x + 'px',
+          top: _canvasGroupRect.y + 'px',
+          width: _canvasGroupRect.w + 'px',
+          height: _canvasGroupRect.h + 'px',
+          backgroundColor: 'red'
+        });
+
+        var _mainCanvas = (0, _jquery.default)('#chart_mainCanvas')[0];
+        var _overlayCanvas = (0, _jquery.default)('#chart_overlayCanvas')[0];
+        var _devicePixelRatio = window.devicePixelRatio;
+
+        var _context = _mainCanvas.getContext("2d");
+
+        var _backingStoreRatio = _context.webkitBackingStorePixelRatio || _context.mozBackingStorePixelRatio || _context.msBackingStorePixelRatio || _context.oBackingStorePixelRatio || _context.backingStorePixelRatio || 1;
+
+        var _ratio = _devicePixelRatio / _backingStoreRatio;
+
+        _kline.default.instance.deviceRatio = _ratio;
+        _mainCanvas.width = _canvasGroupRect.w * _ratio;
+        _mainCanvas.height = _canvasGroupRect.h * _ratio;
+        _overlayCanvas.width = _canvasGroupRect.w * _ratio;
+        ;
+        _overlayCanvas.height = _canvasGroupRect.h * _ratio;
+        ;
+        _mainCanvas.style.width = _canvasGroupRect.w + 'px';
+        _mainCanvas.style.height = _canvasGroupRect.h + "px";
+        _overlayCanvas.style.width = _canvasGroupRect.w + 'px';
+        _overlayCanvas.style.height = _canvasGroupRect.h + 'px'; // mainCanvas.style.overflow = 'scroll';
+
+        var overlayerContext = _overlayCanvas.getContext("2d");
+
+        _context.setTransform(1, 0, 0, 1, 0, 0); //  //   overlayerContext.setTransform(1,0,0,1,0,0);
+
+
+        var centerX = portraitWidth / 2 * _ratio;
+        var centerY = portraitHeight / 2 * _ratio;
+        debugger;
+
+        _context.translate(centerX, centerY);
+
+        _context.rotate(90 * Math.PI / 180);
+
+        _chart_manager.ChartManager.instance.setxy(-centerY, -centerX);
       }
-
-      debugger;
-
-      if (showCount < ranges.length) {
-        periodsVert.show();
-
-        _kline.default.instance.periodsVertDisplayNone(chatPeriodToolRanages);
-      } else {
-        periodsVert.hide();
-      } /////
-
-
-      var showIndic = (0, _jquery.default)('#chart_show_indicator')[0];
-      var showTools = (0, _jquery.default)('#chart_show_tools')[0];
-      var selectTheme = (0, _jquery.default)('#chart_toolbar_theme')[0];
-      var dropDownSettings = (0, _jquery.default)('#chart_dropdown_settings');
-      dropDownSettings.css('display', "none");
-      (0, _jquery.default)("#chart_language_setting_div").css('display', "none");
-      var periodsVertNW = periodsVert[0].offsetWidth;
-      var periodsHorzNW = periodsVertNW + periodsHorz.offsetWidth;
-      var showIndicNW = periodsHorzNW + showIndic.offsetWidth + 4;
-      var showToolsNW = showIndicNW + showTools.offsetWidth + 4;
-      var selectThemeNW = showToolsNW + selectTheme.offsetWidth;
-      var dropDownSettingsW = dropDownSettings.find(".chart_dropdown_t")[0].offsetWidth + 150;
-      periodsVertNW += dropDownSettingsW;
-      periodsHorzNW += dropDownSettingsW;
-      showIndicNW += dropDownSettingsW;
-      showToolsNW += dropDownSettingsW;
-      selectThemeNW += dropDownSettingsW; // if (chartWidth < periodsHorzNW) {
-      //     domElemCache.append(periodsHorz);
-      // } else {
-      //     periodsVert.after(periodsHorz);
-      // }
-
-      if (chartWidth < showIndicNW) {
-        domElemCache.append(showIndic);
-        rowIndic.style.display = "";
-      } else {
-        dropDownSettings.before(showIndic);
-        rowIndic.style.display = "none";
-      }
-
-      if (chartWidth < showToolsNW) {
-        domElemCache.append(showTools);
-        rowTools.style.display = "";
-      } else {
-        dropDownSettings.before(showTools);
-        rowTools.style.display = "none";
-      }
-
-      if (chartWidth < selectThemeNW) {
-        domElemCache.append(selectTheme);
-        rowTheme.style.display = "";
-      } else {
-        dropDownSettings.before(selectTheme);
-        rowTheme.style.display = "none";
-      } // $('#chart_show_indicator').hide();
-      // $('#chart_show_tools').hide();
-      // $('#chart_toolbar_theme').hide();
-
 
       _chart_manager.ChartManager.instance.redraw('All', true);
 
@@ -10203,7 +10330,7 @@ var _chart_manager = __webpack_require__(4);
 
 var _named_object = __webpack_require__(9);
 
-var data_sources = _interopRequireWildcard(__webpack_require__(12));
+var data_sources = _interopRequireWildcard(__webpack_require__(13));
 
 var _util = __webpack_require__(21);
 
@@ -10403,7 +10530,7 @@ var _cpoint = __webpack_require__(39);
 
 var _util = __webpack_require__(21);
 
-var data_sources = _interopRequireWildcard(__webpack_require__(12));
+var data_sources = _interopRequireWildcard(__webpack_require__(13));
 
 var plotters = _interopRequireWildcard(__webpack_require__(41));
 
@@ -11720,7 +11847,7 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports.CDynamicLinePlotter = exports.DrawFibFansPlotter = exports.DrawBandLinesPlotter = exports.DrawFibRetracePlotter = exports.BandLinesPlotter = exports.DrawTriParallelLinesPlotter = exports.DrawBiParallelRayLinesPlotter = exports.DrawBiParallelLinesPlotter = exports.ParallelLinesPlotter = exports.DrawPriceLinesPlotter = exports.DrawVertiStraightLinesPlotter = exports.DrawHoriSegLinesPlotter = exports.DrawHoriRayLinesPlotter = exports.DrawHoriStraightLinesPlotter = exports.DrawArrowLinesPlotter = exports.DrawRayLinesPlotter = exports.DrawSegLinesPlotter = exports.DrawStraightLinesPlotter = exports.CToolPlotter = exports.RangeSelectionPlotter = exports.TimelineSelectionPlotter = exports.SelectionPlotter = exports.LastClosePlotter = exports.LastVolumePlotter = exports.COrderGraphPlotter = exports.RangePlotter = exports.TimelinePlotter = exports.MinMaxPlotter = exports.IndicatorInfoPlotter = exports.IndicatorPlotter = exports.MainInfoPlotter = exports.OHLCPlotter = exports.CandlestickHLCPlotter = exports.CandlestickPlotter = exports.CGridPlotter = exports.TimelineAreaBackgroundPlotter = exports.RangeAreaBackgroundPlotter = exports.MainAreaBackgroundPlotter = exports.BackgroundPlotter = exports.Plotter = void 0;
 
-var _kline = _interopRequireDefault(__webpack_require__(17));
+var _kline = _interopRequireDefault(__webpack_require__(12));
 
 var _named_object = __webpack_require__(9);
 
@@ -11736,7 +11863,7 @@ var themes = _interopRequireWildcard(__webpack_require__(22));
 
 var data_providers = _interopRequireWildcard(__webpack_require__(42));
 
-var data_sources = _interopRequireWildcard(__webpack_require__(12));
+var data_sources = _interopRequireWildcard(__webpack_require__(13));
 
 var ctools = _interopRequireWildcard(__webpack_require__(40));
 
@@ -15136,7 +15263,7 @@ var _chart_manager = __webpack_require__(4);
 
 var _util = __webpack_require__(21);
 
-var data_sources = _interopRequireWildcard(__webpack_require__(12));
+var data_sources = _interopRequireWildcard(__webpack_require__(13));
 
 function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) { var desc = Object.defineProperty && Object.getOwnPropertyDescriptor ? Object.getOwnPropertyDescriptor(obj, key) : {}; if (desc.get || desc.set) { Object.defineProperty(newObj, key, desc); } else { newObj[key] = obj[key]; } } } } newObj.default = obj; return newObj; } }
 
@@ -16200,7 +16327,7 @@ var Query_1 = __webpack_require__(73);
 var Repo_1 = __webpack_require__(34);
 var Path_1 = __webpack_require__(2);
 var QueryParams_1 = __webpack_require__(181);
-var validation_1 = __webpack_require__(13);
+var validation_1 = __webpack_require__(14);
 var util_2 = __webpack_require__(0);
 var util_3 = __webpack_require__(0);
 var SyncPoint_1 = __webpack_require__(84);
@@ -16498,7 +16625,7 @@ SyncPoint_1.SyncPoint.__referenceConstructor = Reference;
  */
 Object.defineProperty(exports, "__esModule", { value: true });
 var util_1 = __webpack_require__(0);
-var validation_1 = __webpack_require__(13);
+var validation_1 = __webpack_require__(14);
 var Path_1 = __webpack_require__(2);
 var PriorityIndex_1 = __webpack_require__(5);
 /**
@@ -17234,7 +17361,7 @@ var util_1 = __webpack_require__(0);
 var Repo_1 = __webpack_require__(34);
 var util_2 = __webpack_require__(1);
 var parser_1 = __webpack_require__(70);
-var validation_1 = __webpack_require__(13);
+var validation_1 = __webpack_require__(14);
 __webpack_require__(183);
 /** @const {string} */
 var DATABASE_URL_OPTION = 'databaseURL';
@@ -21523,7 +21650,7 @@ var Reference_1 = __webpack_require__(45);
 var Repo_1 = __webpack_require__(34);
 var RepoManager_1 = __webpack_require__(50);
 var util_2 = __webpack_require__(0);
-var validation_1 = __webpack_require__(13);
+var validation_1 = __webpack_require__(14);
 /**
  * Class representing a firebase database.
  * @implements {FirebaseService}
@@ -22127,7 +22254,7 @@ exports.RepoInfo = RepoInfo;
  */
 Object.defineProperty(exports, "__esModule", { value: true });
 var util_1 = __webpack_require__(0);
-var validation_1 = __webpack_require__(13);
+var validation_1 = __webpack_require__(14);
 var util_2 = __webpack_require__(1);
 var util_3 = __webpack_require__(0);
 /**
@@ -22254,7 +22381,7 @@ var ValueIndex_1 = __webpack_require__(75);
 var PathIndex_1 = __webpack_require__(79);
 var util_2 = __webpack_require__(1);
 var Path_1 = __webpack_require__(2);
-var validation_1 = __webpack_require__(13);
+var validation_1 = __webpack_require__(14);
 var util_3 = __webpack_require__(0);
 var EventRegistration_1 = __webpack_require__(158);
 var util_4 = __webpack_require__(0);
@@ -23772,7 +23899,7 @@ exports.CountedSet = CountedSet;
  * limitations under the License.
  */
 Object.defineProperty(exports, "__esModule", { value: true });
-var Operation_1 = __webpack_require__(14);
+var Operation_1 = __webpack_require__(15);
 var Path_1 = __webpack_require__(2);
 /**
  * @param {!OperationSource} source
@@ -26841,7 +26968,7 @@ exports.RangedFilter = RangedFilter;
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_tslib__ = __webpack_require__(3);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__firebase_util__ = __webpack_require__(0);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__firebase_util___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_1__firebase_util__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__models_errors__ = __webpack_require__(15);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__models_errors__ = __webpack_require__(16);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__models_token_details_model__ = __webpack_require__(190);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__models_vapid_details_model__ = __webpack_require__(192);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__models_notification_permission__ = __webpack_require__(97);
@@ -27196,7 +27323,7 @@ var ControllerInterface = /** @class */ (function () {
 "use strict";
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__firebase_util__ = __webpack_require__(0);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__firebase_util___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0__firebase_util__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__errors__ = __webpack_require__(15);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__errors__ = __webpack_require__(16);
 /**
  * Copyright 2017 Google Inc.
  *
@@ -27295,7 +27422,7 @@ var DBInterface = /** @class */ (function () {
 "use strict";
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__firebase_util__ = __webpack_require__(0);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__firebase_util___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0__firebase_util__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__errors__ = __webpack_require__(15);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__errors__ = __webpack_require__(16);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__helpers_array_buffer_to_base64__ = __webpack_require__(51);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__fcm_details__ = __webpack_require__(52);
 /**
@@ -28417,7 +28544,7 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports.default = void 0;
 
-var _kline = _interopRequireDefault(__webpack_require__(17));
+var _kline = _interopRequireDefault(__webpack_require__(12));
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -28441,7 +28568,7 @@ var _chart_manager = __webpack_require__(4);
 
 var _control = __webpack_require__(38);
 
-var _kline = _interopRequireDefault(__webpack_require__(17));
+var _kline = _interopRequireDefault(__webpack_require__(12));
 
 var _templates = __webpack_require__(27);
 
@@ -28941,7 +29068,7 @@ var _named_object = __webpack_require__(9);
 
 var _chart_manager = __webpack_require__(4);
 
-var _data_sources = __webpack_require__(12);
+var _data_sources = __webpack_require__(13);
 
 function _typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
 
@@ -31015,7 +31142,7 @@ exports = module.exports = __webpack_require__(113)(false);
 
 
 // module
-exports.push([module.i, "html, body {\n    min-height: 100%;\n    margin: 0;\n    min-width: 100%\n}\n\n.kline {\n    -webkit-overflow-scrolling: touch;\n    margin-left: auto;\n    margin-right: auto;\n    position: relative;\n}\n\nul, li {\n    padding: 0;\n    margin: 0;\n}\n\nli {\n    list-style: none;\n}\n\n.chart_container {\n    cursor: default;\n    font-family: arial, sans, serif;\n    font-size: 12px;\n    height: 100%;\n    position: relative;\n    width: 100%\n}\n\n.chart_container div, .chart_container ul, .chart_container form {\n    margin: 0;\n    padding: 0\n}\n\n.chart_container a:hover {\n    text-decoration: none\n}\n\n.chart_container ul {\n    list-style: none;\n    border: 0;\n    margin: 0;\n    padding: 0\n}\n\n.chart_container button {\n    cursor: pointer\n}\n\n#chart_dom_elem_cache {\n    *font-weight: bold;\n    position: absolute;\n    visibility: hidden;\n    z-index: -1\n}\n\n#chart_toolbar {\n    border-bottom: 1px solid;\n    *font-weight: bold;\n    height: 29px;\n    position: absolute;\n    z-index: 3\n}\n\n.chart_container.dark #chart_toolbar {\n    background-color: #0a0a0a;\n    border-bottom-color: #404040\n}\n\n.chart_container.light #chart_toolbar {\n    background-color: #fff;\n    border-bottom-color: #afb1b3\n}\n\n.chart_container .chart_toolbar_sep {\n    float: left;\n    height: 100%;\n    width: 16px\n}\n\n.chart_container .chart_toolbar_minisep {\n    float: left;\n    height: 100%;\n    width: 4px\n}\n\n.chart_container .chart_dropdown {\n    display: inline-block;\n    float: left;\n    position: relative;\n    z-index: 100\n}\n\n.chart_container .chart_dropdown_t {\n    background-origin: content-box;\n    background-repeat: no-repeat;\n    border: 1px solid;\n    border-bottom-width: 0;\n    margin-top: 3px;\n    padding-right: 10px;\n    z-index: 101;\n    position: relative\n}\n\n.chart_container .chart_dropdown_t a {\n    display: inline-block;\n    padding: 3px 12px 5px 10px\n}\n\n.chart_container .chart_dropdown_data {\n    border: 1px solid;\n    display: none;\n    position: absolute;\n    padding: 6px 8px 6px 8px;\n    margin-top: -1px;\n    z-index: 100\n}\n\n.chart_container .chart_dropdown_data table {\n    border-collapse: collapse;\n    font-weight: normal;\n    white-space: nowrap\n}\n\n.chart_container .chart_dropdown_data td {\n    border-bottom: 1px solid;\n    padding: 8px 6px;\n    vertical-align: top\n}\n\n.market_chooser .chart_dropdown_data {\n    width: 370px\n}\n\n.market_chooser .chart_dropdown_data td {\n    border-bottom: 1px solid;\n    padding: 1px 6px !important;\n    vertical-align: top;\n    line-height: 24px\n}\n\n.market_chooser li {\n    float: left;\n    width: 80px;\n    height: 24px;\n    line-height: 24px\n}\n\n.chart_container .chart_dropdown_data td.marketName_ a.dark {\n    color: #fff\n}\n\n.chart_container .chart_dropdown_data td.marketName_ a.light {\n    color: #000\n}\n\n.chart_container .chart_dropdown_data table tr:last-child td {\n    border-bottom: 0\n}\n\n.chart_container .chart_dropdown_data li {\n    white-space: nowrap;\n    display: inline-block\n}\n\n.chart_container .chart_dropdown_data a {\n    text-decoration: none;\n    cursor: pointer;\n    padding: 5px 6px 5px 6px\n}\n\n.chart_container .chart_dropdown-hover.chart_dropdown_data {\n    display: block\n}\n\n#chart_dropdown_symbols .chart_dropdown_data td {\n    padding: 8px 6px 0 6px\n}\n\n#chart_dropdown_symbols .chart_dropdown_data li {\n    display: block;\n    height: 26px\n}\n\n#chart_dropdown_symbols .chart_dropdown_data a {\n    cursor: pointer\n}\n\n#chart_dropdown_themes .chart_dropdown_data td:first-child {\n    padding: 6px 1px 7px 6px\n}\n\n.chart_container.dark .chart_dropdown_t {\n    background-image: url(" + escape(__webpack_require__(114)) + ");\n    background-position: right 9px;\n    border-color: #0a0a0a;\n    color: #e5e5e5\n}\n\n.chart_container.dark .chart_dropdown-hover.chart_dropdown_t {\n    background-color: #0a0a0a;\n    background-image: url(" + escape(__webpack_require__(115)) + ");\n    background-position: right 8px;\n    border-color: #606060;\n    color: #fff\n}\n\n.chart_container.dark .chart_dropdown_data {\n    background-color: rgba(10, 10, 10, 0.8);\n    border-color: #606060\n}\n\n.chart_container.dark .chart_dropdown_data td {\n    border-bottom-color: #404040;\n    color: #e5e5e5\n}\n\n.chart_container.dark .chart_dropdown_data li a {\n    color: #1987da\n}\n\n.chart_container.dark .chart_dropdown_data li a:hover {\n    background-color: #383838\n}\n\n.chart_container.dark .chart_dropdown_data li a.selected {\n    color: #ffac00\n}\n\n.chart_container.light .chart_dropdown_t {\n    background-image: url(" + escape(__webpack_require__(116)) + ");\n    background-position: right 10px;\n    border-color: #fff;\n    color: #393c40\n}\n\n.chart_container.light .chart_dropdown-hover.chart_dropdown_t {\n    background-color: #fff;\n    background-image: url(" + escape(__webpack_require__(117)) + ");\n    background-position: right 9px;\n    border-color: #4c4f53;\n    color: #393c40\n}\n\n.chart_container.light .chart_dropdown_data {\n    background-color: #fff;\n    border-color: #4c4f53\n}\n\n.chart_container.light .chart_dropdown_data td {\n    border-bottom-color: #e4e5e6;\n    color: #393c40\n}\n\n.chart_container.light .chart_dropdown_data li a {\n    color: #1478c8\n}\n\n.chart_container.light .chart_dropdown_data a:hover {\n    background-color: #f4f4f4\n}\n\n.chart_container.light .chart_dropdown_data a.selected {\n    color: #f27935\n}\n\n.chart_container .chart_toolbar_label {\n    cursor: default;\n    display: inline-block;\n    float: left;\n    padding: 7px 4px\n}\n\n.chart_container.dark .chart_toolbar_label {\n    border-color: #232323;\n    color: #e5e5e5\n}\n\n.chart_container.light .chart_toolbar_label {\n    border-color: #fff;\n    color: #393c40\n}\n\n.chart_container .chart_toolbar_button {\n    border: 1px solid;\n    cursor: pointer;\n    float: left;\n    margin: 3px 2px;\n    padding: 3px 10px;\n    position: relative;\n    z-index: 100\n}\n\n.chart_container.dark .chart_toolbar_button {\n    border-color: #404040;\n    color: #e5e5e5\n}\n\n.chart_container.dark .chart_toolbar_button:hover {\n    background-color: #383838;\n    border-color: #606060;\n    color: #fff\n}\n\n.chart_container.dark .chart_toolbar_button.selected {\n    background-color: #383838;\n    border-color: #606060;\n    color: #ffac00\n}\n\n.chart_container.dark .chart_toolbar_button.selected:hover {\n    background-color: #474747;\n    border-color: #808080;\n    color: #ffac00\n}\n\n.chart_container.light .chart_toolbar_button {\n    border-color: #ccc;\n    color: #393c40\n}\n\n.chart_container.light .chart_toolbar_button:hover {\n    background-color: #f4f4f4;\n    color: #393c40\n}\n\n.chart_container.light .chart_toolbar_button.selected {\n    background-color: #f4f4f4;\n    border-color: #f27935;\n    color: #f27935\n}\n\n.chart_container .chart_toolbar_tabgroup {\n    float: left\n}\n\n.chart_container .chart_toolbar_tabgroup li {\n    display: inline-block;\n    padding: 4px 0;\n    margin: 3px 0\n}\n\n.chart_container .chart_toolbar_tabgroup li a {\n    cursor: pointer;\n    padding: 4px 4px\n}\n\n.chart_container .chart_toolbar_tabgroup li a:hover {\n    text-decoration: none\n}\n\n.chart_container.dark .chart_toolbar_tabgroup li a {\n    color: #1987da\n}\n\n.chart_container.dark .chart_toolbar_tabgroup li a:hover {\n    background-color: #383838\n}\n\n.chart_container.dark .chart_toolbar_tabgroup li a.selected {\n    color: #ffac00\n}\n\n.chart_container.light .chart_toolbar_tabgroup li a {\n    color: #1478c8\n}\n\n.chart_container.light .chart_toolbar_tabgroup li a:hover {\n    background-color: #f4f4f4\n}\n\n.chart_container.light .chart_toolbar_tabgroup li a.selected {\n    color: #f27935\n}\n\n#chart_toolbar_periods_horz {\n    display: inline-block;\n    float: left;\n    position: relative;\n    z-index: 100\n}\n\n#chart_toolbar_periods_vert {\n    float: left\n}\n\n.chart_container a.chart_icon {\n    border: 1px solid;\n    height: 16px;\n    padding: 0;\n    width: 16px\n}\n\n.chart_container a.chart_icon:hover {\n    border-width: 2px;\n    height: 14px;\n    width: 14px\n}\n\n.chart_container .chart_dropdown_data a.chart_icon {\n    display: inline-block;\n    magin: 0 6px 0 6px\n}\n\n.chart_container a.chart_icon_theme_dark, .chart_container .chart_dropdown_data li a.chart_icon_theme_dark:hover {\n    background-color: #000\n}\n\n.chart_container a.chart_icon_theme_light, .chart_container .chart_dropdown_data li a.chart_icon_theme_light:hover {\n    background-color: #fff\n}\n\n.chart_container #chart_toolbar_theme {\n    float: left;\n    padding: 0 8px\n}\n\n.chart_container #chart_toolbar_theme a.chart_icon {\n    cursor: pointer;\n    float: left;\n    margin: 6px 4px\n}\n\n.chart_container #chart_select_theme td:last-child {\n    padding: 6px 6px 0 8px\n}\n\n.chart_container #chart_select_theme li {\n    padding: 0 4px 0 4px\n}\n\n.chart_container.dark a.chart_icon {\n    border-color: #aaa\n}\n\n.chart_container.dark a.chart_icon:hover {\n    border-color: #1987da\n}\n\n.chart_container.dark a.chart_icon.selected {\n    border-color: #ffac00\n}\n\n.chart_container.light a.chart_icon {\n    border-color: #aaa\n}\n\n.chart_container.light a.chart_icon.selected {\n    border-color: #f27935\n}\n\n/* .chart_container #chart_updated_time {\n    float: right;\n    margin: 4px 3px;\n    padding: 3px 10px\n} */\n\n.chart_container #chart_updated_time {\n    float: right;\n    margin: 4px 3px;\n    padding: 3px 6px\n}\n\n\n.chart_container.dark #chart_updated_time {\n    color: #e5e5e5\n}\n\n.chart_container.light #chart_updated_time {\n    color: #393c40\n}\n\n#chart_toolpanel {\n    border-right: 1px solid;\n    display: none;\n    position: absolute;\n    width: 32px;\n    z-index: 2\n}\n\n#chart_toolpanel .chart_toolpanel_separator {\n    position: relative;\n    height: 4px\n}\n\n#chart_toolpanel .chart_toolpanel_button {\n    position: relative;\n    z-index: 100\n}\n\n#chart_toolpanel .chart_toolpanel_icon {\n    background-origin: content-box;\n    background-repeat: no-repeat;\n    border: 1px solid;\n    cursor: pointer;\n    height: 16px;\n    margin: 1px 4px 1px 4px;\n    padding: 3px;\n    position: relative;\n    width: 16px;\n    z-index: 101\n}\n\n#chart_toolpanel .chart_toolpanel_tip {\n    border-radius: 4px;\n    border: 1px solid;\n    display: none;\n    *font-weight: bold;\n    position: absolute;\n    padding: 3px 6px 4px 6px;\n    margin-left: 36px;\n    margin-top: -25px;\n    white-space: nowrap;\n    z-index: 100\n}\n\n#chart_toolpanel .chart_toolpanel_button:hover .chart_toolpanel_tip {\n    display: block\n}\n\n.chart_container.dark #chart_toolpanel {\n    background-color: #0a0a0a;\n    border-right-color: #404040\n}\n\n.chart_container.dark .chart_toolpanel_icon {\n    background-color: #0a0a0a;\n    border-color: #0a0a0a\n}\n\n.chart_container.dark .chart_toolpanel_button:hover .chart_toolpanel_icon {\n    background-color: #404040;\n    border-color: #666\n}\n\n.chart_container.dark .chart_toolpanel_button.selected .chart_toolpanel_icon {\n    background-color: #080808;\n    border-color: #666\n}\n\n.chart_container.dark .chart_toolpanel_tip {\n    background-color: #ffac00;\n    border-color: #ffac00;\n    color: #0a0a0a\n}\n\n.chart_container.light #chart_toolpanel {\n    background-color: #fff;\n    border-right-color: #afb1b3\n}\n\n.chart_container.light .chart_toolpanel_icon {\n    background-color: #fff;\n    border-color: #fff\n}\n\n.chart_container.light .chart_toolpanel_button:hover .chart_toolpanel_icon {\n    background-color: #eee;\n    border-color: #afb1b3\n}\n\n.chart_container.light .chart_toolpanel_button.selected .chart_toolpanel_icon {\n    background-color: #f4f4f4;\n    border-color: #afb1b3\n}\n\n.chart_container.light .chart_toolpanel_tip {\n    background-color: #f27938;\n    border-color: #f27938;\n    color: #eee\n}\n\n.chart_container.dark #chart_toolpanel .chart_toolpanel_button .chart_toolpanel_icon {\n    background-image: url(" + escape(__webpack_require__(118)) + ")\n}\n\n.chart_container.dark #chart_toolpanel .chart_toolpanel_button.selected .chart_toolpanel_icon {\n    background-image: url(" + escape(__webpack_require__(119)) + ")\n}\n\n.chart_container.dark #chart_toolbar .chart_BoxSize {\n    background: url(" + escape(__webpack_require__(120)) + ") no-repeat;\n}\n\n.chart_container.light #chart_toolpanel .chart_toolpanel_button .chart_toolpanel_icon {\n    background-image: url(" + escape(__webpack_require__(121)) + ")\n}\n\n.chart_container.light #chart_toolpanel .chart_toolpanel_button.selected .chart_toolpanel_icon {\n    background-image: url(" + escape(__webpack_require__(122)) + ")\n}\n\n.chart_container.light #chart_toolbar .chart_BoxSize {\n    background: url(" + escape(__webpack_require__(123)) + ") no-repeat;\n}\n\n.chart_container #chart_toolpanel #chart_Cursor {\n    background-position: 0 0\n}\n\n.chart_container #chart_toolpanel #chart_CrossCursor {\n    background-position: 0 -20px\n}\n\n.chart_container #chart_toolpanel #chart_SegLine {\n    background-position: 0 -40px\n}\n\n.chart_container #chart_toolpanel #chart_StraightLine {\n    background-position: 0 -60px\n}\n\n.chart_container #chart_toolpanel #chart_RayLine {\n    background-position: 0 -100px\n}\n\n.chart_container #chart_toolpanel #chart_ArrowLine {\n    background-position: 0 -80px\n}\n\n.chart_container #chart_toolpanel #chart_HoriSegLine {\n    background-position: 0 -160px\n}\n\n.chart_container #chart_toolpanel #chart_HoriStraightLine {\n    background-position: 0 -120px\n}\n\n.chart_container #chart_toolpanel #chart_HoriRayLine {\n    background-position: 0 -140px\n}\n\n.chart_container #chart_toolpanel #chart_VertiStraightLine {\n    background-position: 0 -180px\n}\n\n.chart_container #chart_toolpanel #chart_PriceLine {\n    background-position: 0 -200px\n}\n\n.chart_container #chart_toolpanel #chart_TriParallelLine {\n    background-position: 0 -220px\n}\n\n.chart_container #chart_toolpanel #chart_BiParallelLine {\n    background-position: 0 -240px\n}\n\n.chart_container #chart_toolpanel #chart_BiParallelRayLine {\n    background-position: 0 -260px\n}\n\n.chart_container .chart_toolpanel_button #chart_DrawFibRetrace {\n    background-position: 0 -280px\n}\n\n.chart_container #chart_toolpanel #chart_DrawFibFans {\n    background-position: 0 -300px\n}\n\n#chart_tabbar {\n    border-top: 1px solid;\n    cursor: default;\n    display: none;\n    *font-weight: bold;\n    height: 22px;\n    overflow: hidden;\n    position: absolute;\n    z-index: 1\n}\n\n#chart_tabbar ul {\n    height: 100%;\n    list-style: none;\n    padding: 0 0 0 4px\n}\n\n#chart_tabbar li {\n    display: inline-block;\n    height: 100%;\n    margin: 0\n}\n\n#chart_tabbar a {\n    cursor: pointer;\n    display: inline-block;\n    height: 100%;\n    margin: 0;\n    padding: 3px 4px 0 4px;\n    overflow: hidden\n}\n\n#chart_tabbar a:hover {\n    text-decoration: none\n}\n\n.chart_container.dark #chart_tabbar {\n    background-color: #0a0a0a;\n    border-top-color: #404040\n}\n\n.chart_container.dark #chart_tabbar a {\n    color: #e5e5e5\n}\n\n.chart_container.dark #chart_tabbar a:hover {\n    background-color: #383838;\n    color: #fff\n}\n\n.chart_container.dark #chart_tabbar a.selected {\n    color: #ffac00\n}\n\n.chart_container.light #chart_tabbar {\n    background-color: #fff;\n    border-top-color: #afb1b3\n}\n\n.chart_container.light #chart_tabbar a {\n    color: #393c40\n}\n\n.chart_container.light #chart_tabbar a:hover {\n    background-color: #f4f4f4;\n    color: #393c40\n}\n\n.chart_container.light #chart_tabbar a.selected {\n    color: #f27935\n}\n\n#chart_canvasGroup {\n    position: absolute;\n    z-index: 0\n}\n\n#chart_mainCanvas {\n    overflow: hidden;\n    position: absolute;\n    z-index: 0\n}\n\n#chart_overlayCanvas {\n    overflow: hidden;\n    position: absolute;\n    z-index: 2\n}\n\n/*\n#chart_loading {\n    border: 1px solid;\n    border-radius: 4px;\n    font-size: 18px;\n    font-weight: bold;\n    line-height: 48px;\n    overflow: hidden;\n    position: absolute;\n    text-align: center;\n    visibility: hidden;\n    width: 200px;\n    z-index: 200\n}\n\n#chart_loading.activated {\n    visibility: visible\n}\n*/\n\n#chart_loading {\n    border: 2px solid #fff;\n    border-left: 2px solid transparent;\n    height: 30px;\n    width: 30px;\n    border-radius: 50%;\n    overflow: hidden;\n    position: absolute;\n    text-align: center;\n    visibility: hidden;\n    z-index: 200;\n}\n\n.chart_str_loading {\n    animation: loading_rotate 1s infinite linear;\n    text-indent: -99999px;\n}\n\n#chart_loading.activated {\n    visibility: visible\n}\n\n@keyframes loading_rotate {\n    0% {\n        transform: rotate(0deg);\n    }\n    100% {\n        transform: rotate(360deg);\n    }\n}\n\n.chart_container.dark #chart_loading {\n    /* border-color: #aaa; */\n    background-color: rgba(0, 0, 0, 0.6);\n    color: #ccc\n}\n\n.chart_container.light #chart_loading {\n    /* border-color: #afb1b3; */\n    background-color: rgba(244, 244, 244, 0.8);\n    color: #393c40\n}\n\n#chart_parameter_settings {\n    border-radius: 4px;\n    border: 1px solid;\n    width: 640px;\n    position: absolute;\n    overflow: hidden;\n    visibility: hidden;\n    z-index: 500\n}\n\n#chart_parameter_settings.clicked {\n    visibility: visible\n}\n\n#chart_parameter_settings h2 {\n    padding: 8px 12px;\n    margin: 0\n}\n\n#chart_parameter_settings table {\n    border-collapse: collapse;\n    width: 100%\n}\n\n#chart_parameter_settings tr {\n    line-height: 32px\n}\n\n#chart_parameter_settings th {\n    text-align: right;\n    padding: 0 4px 0 16px\n}\n\n#chart_parameter_settings input {\n    width: 2em;\n    margin: 0 2px 0 2px\n}\n\n#chart_parameter_settings #close_settings {\n    border-radius: 4px;\n    cursor: pointer;\n    font-weight: bold;\n    text-align: center;\n    margin: 8px auto;\n    padding: 5px 24px 5px 24px;\n    width: 84px\n}\n\n#chart_parameter_settings .chart_str_default {\n    margin-right: 24px\n}\n\n.chart_container.dark #chart_parameter_settings {\n    background-color: rgba(0, 0, 0, 0.9);\n    border-color: rgba(0, 0, 0, 0.9);\n    color: #ccc;\n}\n\n.chart_container.dark #chart_parameter_settings #close_settings {\n    background: #1887da;\n    color: #eee\n}\n\n.chart_container.light #chart_parameter_settings {\n    background-color: rgba(244, 244, 244, 0.8);\n    border-color: #afb1b3;\n    color: #393c40\n}\n\n.chart_container.light #chart_parameter_settings #close_settings {\n    background: #1478c8;\n    color: #eee\n}\n\n.chart_container input, .chart_container button {\n    border-radius: 4px;\n    border: 1px solid;\n    padding: 4px\n}\n\n.chart_container input[type=text] {\n    width: 12em\n}\n\n.chart_container input[type=button], .chart_container input[type=submit], .chart_container button {\n    font-family: arial, sans, serif;\n    padding: 4px 8px;\n    cursor: pointer\n}\n\n.chart_container.dark input, .chart_container.dark button {\n    background-color: #151515;\n    border-color: #333;\n    color: #ccc\n}\n\n.chart_container.light input, .chart_container.light button {\n    background-color: #ddd;\n    border-color: #ddd;\n    color: #222\n}\n\n/* .trade_container {\n    width: 250px;\n    height: 100%;\n    float: right;\n    z-index: 99999;\n    font-size: 12px;\n    overflow: hidden\n} */\n\n.trade_container {\n    width: 100%;\n    height: auto;\n    z-index: 99999;\n    font-size: 12px;\n    overflow: hidden;\n    padding-bottom: 15px;\n}\n\n.trade_container.dark {\n    background: #0a0a0a;\n    color: #f1f1f1\n}\n\n.m_righttop {\n    position: fixed;\n    top: 0;\n    height: 41px;\n    line-height: 41px;\n    width: 230px;\n    text-align: right;\n    padding-right: 20px;\n    font-size: 16px;\n    color: #f78d15;\n    font-family: Gotham, \"Helvetica Neue\", Helvetica, Arial, sans-serif\n}\n\n.m_righttop em {\n    width: 123px;\n    height: 28px;\n    background-position: 0 0;\n    display: block;\n    float: right;\n    margin-top: 5px\n}\n\n.dark .m_righttop em {\n    background-position: 0 0\n}\n\n.m_rightbot {\n    height: 22px;\n    line-height: 22px;\n    border-top: 1px solid #404040;\n    width: 230px;\n    text-align: right;\n    padding-right: 20px;\n    background-color: #0a0a0a;\n    border-bottom-color: #404040\n}\n\n/* \n.m_guadan {\n    margin-top: 29px;\n    overflow: hidden;\n    border-left: 1px solid #404040;\n    border-top: 1px solid #404040\n} */\n\n.m_guadan {\n    padding: 0 10px;\n    margin-top: 0px;\n    overflow: hidden;\n    border-left: 1px solid #404040;\n    border-top: 1px solid #404040\n}\n\n.m_guadan a {\n    font-weight: bold;\n    color: #FFF;\n    text-decoration: none\n}\n\n/* .light .m_guadan {\n    margin-top: 29px;\n    overflow: hidden;\n    border-left: 1px solid #afb1b3;\n    border-top: 1px solid #afb1b3\n} */\n\n.light .m_guadan {\n    margin-top: 0px;\n    overflow: hidden;\n    border-left: 1px solid #afb1b3;\n    border-top: 1px solid #afb1b3\n}\n\n#trades, #description {\n    display: none;\n}\n\n/* #orderbook #asks, #orderbook #gasks, #orderbook #bids, #orderbook #gbids {\n    height: 195px;\n    position: relative;\n    display: inline-block;\n    overflow: hidden\n} */\n\n#orderbook #asks, #orderbook #gasks, #orderbook #bids, #orderbook #gbids {\n    height: 195px;\n    position: relative;\n    overflow: hidden\n}\n#asks\n{\n    left: 25px;\n}\n\n/* .symbol-title {\n    font-size: 14px;\n    font-weight: bold;\n    text-align: center;\n    height: 16px;\n    line-height: 16px;\n    font-family: Arial, sans, serif;\n    padding: 5px\n} */\n\n.symbol-title {\n    font-size: 20px;\n    font-weight: bold;\n    text-align: center;\n    height: 24px;\n    line-height: 24px;\n    font-family: Arial, sans, serif;\n    padding: 5px\n}\n\n.symbol-title .dark {\n    color: #6BF\n}\n\n.symbol-title .infoDepth {\n    margin-left: 8px;\n    color: #f78d15\n}\n\n.symbol-title a:hover {\n    text-decoration: underline\n}\n\n/* #asks, #bids {\n    width: 150px\n} */\n\n\n#asks, #bids {\n    flex: 1;\n}\n\n\n/* #orderbook {\n    padding-left: 3px;\n    border-bottom: 1px solid #222;\n    padding-bottom: 2px;\n    margin-left: 5px;\n    margin-bottom: 2px\n} */\n\n#orderbook {\n    display: flex;\n}\n\n#asks, #bids {\n    flex: 1;\n}\n\n#tabList {\n    display: flex;\n}\n\n#tabList li {\n    flex: 1;\n    text-align: center;\n    line-height: 30px;\n}\n\n#tabList li.current {\n    color: #0F0;\n}\n\n#orderbook .table {\n    position: absolute;\n    border-collapse: collapse;\n    padding: 0;\n    margin: 0\n}\n\n#gasks .table, #asks .table {\n    bottom: 0\n}\n\n#orderbook .table .row {\n    padding: 0;\n    margin: 0;\n    height: 13px;\n    line-height: 13px;\n    font-family: Consolas, monospace\n}\n\n#orderbook .table .row {\n    line-height: 13px\n}\n\n#orderbook .table .g {\n    color: #666\n}\n\n#gasks, #gbids {\n    width: 80px\n}\n\n#gasks .amount, #gbids .amount {\n    float: right\n}\n\n#gasks .price, #gbids .price {\n    float: left;\n    text-align: right\n}\n\n.price {\n    margin-right: 10px\n}\n\n.price h {\n    visibility: hidden\n}\n\n.price g, .amount g {\n    color: #666\n}\n\n#price {\n    text-align: center;\n    font-size: 16px;\n    font-weight: bold;\n    height: 25px;\n    line-height: 25px\n}\n\n.chart_trade_quotation {\n    height: 80px;\n    background-color: #0a0a0a;\n    position: relative;\n}\n\n#chart_trade_quotation_content ul, li {\n    list-style: none;\n    padding: 0;\n    margin: 0;\n}\n\n.chart_trade_quotation .green {\n    color: #0F0\n}\n\n.chart_trade_quotation .red {\n    color: #F00\n}\n\n#chart_trade_quotation_content li {\n    position: absolute;\n    display: block;\n    font-size: 12px;\n}\n\n#chart_trade_quotation_content li:nth-of-type(1) {\n    left: 20px;\n    top: 24px;\n}\n\n#chart_trade_quotation_content li:nth-of-type(2) {\n    left: 26px;\n    top: 36px;\n    color: whitesmoke;\n}\n\n#chart_trade_quotation_content li:nth-of-type(3) {\n    right: 10px;\n    top: 10px;\n    color: goldenrod;\n}\n\n#chart_trade_quotation_content li:nth-of-type(4) {\n    color: yellowgreen;\n    top: 28px;\n    right: 10px;\n}\n\n#chart_trade_quotation_content li:nth-of-type(5) {\n    color: orchid;\n    top: 49px;\n    right: 10px;\n}\n\n.trade_container .green {\n    color: #0F0\n}\n\n.trade_container .red {\n    color: #F00\n}\n\n.trade_container.dark #orderbook div.table div.remove g, .trade_container.dark #orderbook div.table div.remove span {\n    color: #444\n}\n\n.trade_container.light #orderbook div.table div.remove g, .trade_container.light #orderbook div.table div.remove span {\n    color: #ddd\n}\n\n.trade_container.dark #orderbook div.table div.add {\n    display: none;\n    background-color: rgba(238, 238, 238, 0.2)\n}\n\n.trade_container.light #orderbook div.table div.add {\n    display: none;\n    background-color: rgba(100, 100, 100, 0.2)\n}\n/* \n#trades {\n    overflow-y: auto;\n    text-align: left;\n    color: #666;\n    padding-top: 5px\n} */\n\n\n#trades {\n    overflow-y: auto;\n    text-align: left;\n    color: #666;\n}\n\n.trade_container.light {\n    background: #fff;\n    border-left: 1px solid #afb1b3;\n    color: #000\n}\n\n.trade_container.light .m_righttop em {\n    background-position: 0 -32px\n}\n\n.trade_container.light .m_righttop {\n    position: fixed;\n    top: 0;\n    height: 40px;\n    line-height: 40px;\n    background: #FFF;\n    width: 230px;\n    border-bottom: 1px solid #afb1b3;\n    text-align: right;\n    padding-right: 20px\n}\n\n.trade_container.light #trades.trades table {\n    color: #333\n}\n\n.trade_container.light #trades.trades .v {\n    color: #333\n}\n\n.trade_container.light #trades.trades .v g {\n    color: #333\n}\n\n.trade_container.light .m_rightbot {\n    background: #fff;\n    border-top: 1px solid #afb1b3\n}\n\n.trade_container.light #orderbook {\n    border-bottom: 1px solid #afb1b3\n}\n\n/* .trades_list {\n    padding-left: 25px\n}\n\n.trades_list ul {\n    width: 200px;\n    height: 14px;\n    line-height: 14px;\n    text-align: left;\n    list-style: none;\n    clear: both;\n    zoom: 1;\n    margin: 0;\n    padding: 0\n} */\n\n.trades_list {\n    padding-left: 25px\n}\n\n.trades_list ul {\n    width: 100%;\n    height: 14px;\n    line-height: 14px;\n    text-align: left;\n    list-style: none;\n    clear: both;\n    zoom: 1;\n    margin: 0;\n    padding: 0;\n    display: flex;\n}\n\n/* .trades_list ul li {\n    height: 14px;\n    line-height: 14px;\n    color: #999;\n    font-size: 12px;\n    list-style: none;\n    float: left;\n    *display: inline;\n    margin: 0;\n    padding: 0;\n    font-family: Consolas, monospace\n} */\n\n.trades_list ul li {\n    height: 14px;\n    line-height: 14px;\n    color: #999;\n    font-size: 12px;\n    list-style: none;\n    float: left;\n    *display: inline;\n    margin: 0;\n    padding: 0;\n    font-family: Consolas, monospace;\n    flex: 1;\n}\n\n.trades_list ul li.tm {\n    width: 62px;\n    color: #999\n}\n\n.trades_list ul li.pr-green {\n    width: 65px;\n    color: #6c6\n}\n\n.trades_list ul li.pr-red {\n    width: 65px;\n    color: #c66\n}\n\n.trades_list ul li.vl {\n    width: 60px;\n    color: #ccc\n}\n\n.trades_list ul li.vl g {\n    color: #666\n}\n\n.trade_container.dark .trades_list ul.newul {\n    display: none;\n    background-color: rgba(238, 238, 238, 0.2)\n}\n\n.trade_container.light .trades_list ul.newul {\n    display: none;\n    background-color: rgba(100, 100, 100, 0.2)\n}\n\n.light .trades_list ul li.tm {\n    color: #333\n}\n\n.light .trades_list ul li.pr-green {\n    color: #6c6\n}\n\n.light .trades_list ul li.pr-red {\n    color: #c66\n}\n\n.light .trades_list ul li.vl {\n    color: #333\n}\n\n.light .trades_list ul li.vl g {\n    color: #333\n}\n\n.container .nav {\n    margin: 0;\n    list-style: none;\n    padding: 0 0 0 3px;\n    height: 41px\n}\n\n.container .nav li {\n    display: inline-block;\n    margin-right: 9px\n}\n\n.container a {\n    text-decoration: none;\n    color: #6BF;\n    font-family: Arial, sans, serif\n}\n\n.container a:hover {\n    text-decoration: underline\n}\n\n.container a.active {\n    color: #FC9\n}\n\n.container span {\n    margin-left: 3px;\n    font-family: Consolas, monospace;\n    color: #ccc\n}\n\n.light .container span {\n    color: #333\n}\n\n.light .container a {\n    text-decoration: none;\n    color: #1478c8;\n    font-family: Arial, sans, serif\n}\n\n.chart_BoxSize {\n    width: 20px;\n    height: 20px\n}\n\n\n/* #chart_main_indicator {\n    float: right;\n    right: 12px;\n} */\n\n#chart_main_indicator li {\n    line-height: 24px;\n    display: block;\n}", ""]);
+exports.push([module.i, "html, body {\n    min-height: 100%;\n    margin: 0;\n    min-width: 100%\n}\n\n.kline {\n    -webkit-overflow-scrolling: touch;\n    margin-left: auto;\n    margin-right: auto;\n    position: relative;\n}\n\nul, li {\n    padding: 0;\n    margin: 0;\n}\n\nli {\n    list-style: none;\n}\n\n.chart_container {\n    cursor: default;\n    font-family: arial, sans, serif;\n    font-size: 12px;\n    height: 100%;\n    position: relative;\n    width: 100%\n}\n\n.chart_container div, .chart_container ul, .chart_container form {\n    margin: 0;\n    padding: 0\n}\n\n.chart_container a:hover {\n    text-decoration: none\n}\n\n.chart_container ul {\n    list-style: none;\n    border: 0;\n    margin: 0;\n    padding: 0\n}\n\n.chart_container button {\n    cursor: pointer\n}\n\n#chart_dom_elem_cache {\n    *font-weight: bold;\n    position: absolute;\n    visibility: hidden;\n    z-index: -1\n}\n\n#chart_toolbar {\n    border-bottom: 1px solid;\n    *font-weight: bold;\n    height: 29px;\n    position: absolute;\n    z-index: 3\n}\n\n.chart_container.dark #chart_toolbar {\n    background-color: #0a0a0a;\n    border-bottom-color: #404040\n}\n\n.chart_container.light #chart_toolbar {\n    background-color: #fff;\n    border-bottom-color: #afb1b3\n}\n\n.chart_container .chart_toolbar_sep {\n    float: left;\n    height: 100%;\n    width: 16px\n}\n\n.chart_container .chart_toolbar_minisep {\n    float: left;\n    height: 100%;\n    width: 4px\n}\n\n.chart_container .chart_dropdown {\n    display: inline-block;\n    float: left;\n    position: relative;\n    z-index: 100\n}\n\n.chart_container .chart_dropdown_t {\n    background-origin: content-box;\n    background-repeat: no-repeat;\n    border: 1px solid;\n    border-bottom-width: 0;\n    margin-top: 3px;\n    padding-right: 10px;\n    z-index: 101;\n    position: relative\n}\n\n.chart_container .chart_dropdown_t a {\n    display: inline-block;\n    padding: 3px 12px 5px 10px\n}\n\n.chart_container .chart_dropdown_data {\n    border: 1px solid;\n    display: none;\n    position: absolute;\n    padding: 6px 8px 6px 8px;\n    margin-top: -1px;\n    z-index: 100\n}\n\n.chart_container .chart_dropdown_data table {\n    border-collapse: collapse;\n    font-weight: normal;\n    white-space: nowrap\n}\n\n.chart_container .chart_dropdown_data td {\n    border-bottom: 1px solid;\n    padding: 8px 6px;\n    vertical-align: top\n}\n\n.market_chooser .chart_dropdown_data {\n    width: 370px\n}\n\n.market_chooser .chart_dropdown_data td {\n    border-bottom: 1px solid;\n    padding: 1px 6px !important;\n    vertical-align: top;\n    line-height: 24px\n}\n\n.market_chooser li {\n    float: left;\n    width: 80px;\n    height: 24px;\n    line-height: 24px\n}\n\n.chart_container .chart_dropdown_data td.marketName_ a.dark {\n    color: #fff\n}\n\n.chart_container .chart_dropdown_data td.marketName_ a.light {\n    color: #000\n}\n\n.chart_container .chart_dropdown_data table tr:last-child td {\n    border-bottom: 0\n}\n\n.chart_container .chart_dropdown_data li {\n    white-space: nowrap;\n    display: inline-block\n}\n\n.chart_container .chart_dropdown_data a {\n    text-decoration: none;\n    cursor: pointer;\n    padding: 5px 6px 5px 6px\n}\n\n.chart_container .chart_dropdown-hover.chart_dropdown_data {\n    display: block\n}\n\n#chart_dropdown_symbols .chart_dropdown_data td {\n    padding: 8px 6px 0 6px\n}\n\n#chart_dropdown_symbols .chart_dropdown_data li {\n    display: block;\n    height: 26px\n}\n\n#chart_dropdown_symbols .chart_dropdown_data a {\n    cursor: pointer\n}\n\n#chart_dropdown_themes .chart_dropdown_data td:first-child {\n    padding: 6px 1px 7px 6px\n}\n\n.chart_container.dark .chart_dropdown_t {\n    background-image: url(" + escape(__webpack_require__(114)) + ");\n    background-position: right 9px;\n    border-color: #0a0a0a;\n    color: #e5e5e5\n}\n\n.chart_container.dark .chart_dropdown-hover.chart_dropdown_t {\n    background-color: #0a0a0a;\n    background-image: url(" + escape(__webpack_require__(115)) + ");\n    background-position: right 8px;\n    border-color: #606060;\n    color: #fff\n}\n\n.chart_container.dark .chart_dropdown_data {\n    background-color: rgba(10, 10, 10, 0.8);\n    border-color: #606060\n}\n\n.chart_container.dark .chart_dropdown_data td {\n    border-bottom-color: #404040;\n    color: #e5e5e5\n}\n\n.chart_container.dark .chart_dropdown_data li a {\n    color: #1987da\n}\n\n.chart_container.dark .chart_dropdown_data li a:hover {\n    background-color: #383838\n}\n\n.chart_container.dark .chart_dropdown_data li a.selected {\n    color: #ffac00\n}\n\n.chart_container.light .chart_dropdown_t {\n    background-image: url(" + escape(__webpack_require__(116)) + ");\n    background-position: right 10px;\n    border-color: #fff;\n    color: #393c40\n}\n\n.chart_container.light .chart_dropdown-hover.chart_dropdown_t {\n    background-color: #fff;\n    background-image: url(" + escape(__webpack_require__(117)) + ");\n    background-position: right 9px;\n    border-color: #4c4f53;\n    color: #393c40\n}\n\n.chart_container.light .chart_dropdown_data {\n    background-color: #fff;\n    border-color: #4c4f53\n}\n\n.chart_container.light .chart_dropdown_data td {\n    border-bottom-color: #e4e5e6;\n    color: #393c40\n}\n\n.chart_container.light .chart_dropdown_data li a {\n    color: #1478c8\n}\n\n.chart_container.light .chart_dropdown_data a:hover {\n    background-color: #f4f4f4\n}\n\n.chart_container.light .chart_dropdown_data a.selected {\n    color: #f27935\n}\n\n.chart_container .chart_toolbar_label {\n    cursor: default;\n    display: inline-block;\n    float: left;\n    padding: 7px 4px\n}\n\n.chart_container.dark .chart_toolbar_label {\n    border-color: #232323;\n    color: #e5e5e5\n}\n\n.chart_container.light .chart_toolbar_label {\n    border-color: #fff;\n    color: #393c40\n}\n\n.chart_container .chart_toolbar_button {\n    border: 1px solid;\n    cursor: pointer;\n    float: left;\n    margin: 3px 2px;\n    padding: 3px 10px;\n    position: relative;\n    z-index: 100\n}\n\n.chart_container.dark .chart_toolbar_button {\n    border-color: #404040;\n    color: #e5e5e5\n}\n\n.chart_container.dark .chart_toolbar_button:hover {\n    background-color: #383838;\n    border-color: #606060;\n    color: #fff\n}\n\n.chart_container.dark .chart_toolbar_button.selected {\n    background-color: #383838;\n    border-color: #606060;\n    color: #ffac00\n}\n\n.chart_container.dark .chart_toolbar_button.selected:hover {\n    background-color: #474747;\n    border-color: #808080;\n    color: #ffac00\n}\n\n.chart_container.light .chart_toolbar_button {\n    border-color: #ccc;\n    color: #393c40\n}\n\n.chart_container.light .chart_toolbar_button:hover {\n    background-color: #f4f4f4;\n    color: #393c40\n}\n\n.chart_container.light .chart_toolbar_button.selected {\n    background-color: #f4f4f4;\n    border-color: #f27935;\n    color: #f27935\n}\n\n.chart_container .chart_toolbar_tabgroup {\n    float: left\n}\n\n.chart_container .chart_toolbar_tabgroup li {\n    display: inline-block;\n    padding: 4px 0;\n    margin: 3px 0\n}\n\n.chart_container .chart_toolbar_tabgroup li a {\n    cursor: pointer;\n    padding: 4px 4px\n}\n\n.chart_container .chart_toolbar_tabgroup li a:hover {\n    text-decoration: none\n}\n\n.chart_container.dark .chart_toolbar_tabgroup li a {\n    color: #1987da\n}\n\n.chart_container.dark .chart_toolbar_tabgroup li a:hover {\n    background-color: #383838\n}\n\n.chart_container.dark .chart_toolbar_tabgroup li a.selected {\n    color: #ffac00\n}\n\n.chart_container.light .chart_toolbar_tabgroup li a {\n    color: #1478c8\n}\n\n.chart_container.light .chart_toolbar_tabgroup li a:hover {\n    background-color: #f4f4f4\n}\n\n.chart_container.light .chart_toolbar_tabgroup li a.selected {\n    color: #f27935\n}\n\n#chart_toolbar_periods_horz {\n    display: inline-block;\n    float: left;\n    position: relative;\n    z-index: 100\n}\n\n#chart_toolbar_periods_vert {\n    float: left\n}\n\n.chart_container a.chart_icon {\n    border: 1px solid;\n    height: 16px;\n    padding: 0;\n    width: 16px\n}\n\n.chart_container a.chart_icon:hover {\n    border-width: 2px;\n    height: 14px;\n    width: 14px\n}\n\n.chart_container .chart_dropdown_data a.chart_icon {\n    display: inline-block;\n    magin: 0 6px 0 6px\n}\n\n.chart_container a.chart_icon_theme_dark, .chart_container .chart_dropdown_data li a.chart_icon_theme_dark:hover {\n    background-color: #000\n}\n\n.chart_container a.chart_icon_theme_light, .chart_container .chart_dropdown_data li a.chart_icon_theme_light:hover {\n    background-color: #fff\n}\n\n.chart_container #chart_toolbar_theme {\n    float: left;\n    padding: 0 8px\n}\n\n.chart_container #chart_toolbar_theme a.chart_icon {\n    cursor: pointer;\n    float: left;\n    margin: 6px 4px\n}\n\n.chart_container #chart_select_theme td:last-child {\n    padding: 6px 6px 0 8px\n}\n\n.chart_container #chart_select_theme li {\n    padding: 0 4px 0 4px\n}\n\n.chart_container.dark a.chart_icon {\n    border-color: #aaa\n}\n\n.chart_container.dark a.chart_icon:hover {\n    border-color: #1987da\n}\n\n.chart_container.dark a.chart_icon.selected {\n    border-color: #ffac00\n}\n\n.chart_container.light a.chart_icon {\n    border-color: #aaa\n}\n\n.chart_container.light a.chart_icon.selected {\n    border-color: #f27935\n}\n\n/* .chart_container #chart_updated_time {\n    float: right;\n    margin: 4px 3px;\n    padding: 3px 10px\n} */\n\n.chart_container #chart_updated_time {\n    float: right;\n    margin: 4px 3px;\n    padding: 3px 10px\n}\n\n\n.chart_container.dark #chart_updated_time {\n    color: #e5e5e5\n}\n\n.chart_container.light #chart_updated_time {\n    color: #393c40\n}\n\n#chart_toolpanel {\n    border-right: 1px solid;\n    display: none;\n    position: absolute;\n    width: 32px;\n    z-index: 2\n}\n\n#chart_toolpanel .chart_toolpanel_separator {\n    position: relative;\n    height: 4px\n}\n\n#chart_toolpanel .chart_toolpanel_button {\n    position: relative;\n    z-index: 100\n}\n\n#chart_toolpanel .chart_toolpanel_icon {\n    background-origin: content-box;\n    background-repeat: no-repeat;\n    border: 1px solid;\n    cursor: pointer;\n    height: 16px;\n    margin: 1px 4px 1px 4px;\n    padding: 3px;\n    position: relative;\n    width: 16px;\n    z-index: 101\n}\n\n#chart_toolpanel .chart_toolpanel_tip {\n    border-radius: 4px;\n    border: 1px solid;\n    display: none;\n    *font-weight: bold;\n    position: absolute;\n    padding: 3px 6px 4px 6px;\n    margin-left: 36px;\n    margin-top: -25px;\n    white-space: nowrap;\n    z-index: 100\n}\n\n#chart_toolpanel .chart_toolpanel_button:hover .chart_toolpanel_tip {\n    display: block\n}\n\n.chart_container.dark #chart_toolpanel {\n    background-color: #0a0a0a;\n    border-right-color: #404040\n}\n\n.chart_container.dark .chart_toolpanel_icon {\n    background-color: #0a0a0a;\n    border-color: #0a0a0a\n}\n\n.chart_container.dark .chart_toolpanel_button:hover .chart_toolpanel_icon {\n    background-color: #404040;\n    border-color: #666\n}\n\n.chart_container.dark .chart_toolpanel_button.selected .chart_toolpanel_icon {\n    background-color: #080808;\n    border-color: #666\n}\n\n.chart_container.dark .chart_toolpanel_tip {\n    background-color: #ffac00;\n    border-color: #ffac00;\n    color: #0a0a0a\n}\n\n.chart_container.light #chart_toolpanel {\n    background-color: #fff;\n    border-right-color: #afb1b3\n}\n\n.chart_container.light .chart_toolpanel_icon {\n    background-color: #fff;\n    border-color: #fff\n}\n\n.chart_container.light .chart_toolpanel_button:hover .chart_toolpanel_icon {\n    background-color: #eee;\n    border-color: #afb1b3\n}\n\n.chart_container.light .chart_toolpanel_button.selected .chart_toolpanel_icon {\n    background-color: #f4f4f4;\n    border-color: #afb1b3\n}\n\n.chart_container.light .chart_toolpanel_tip {\n    background-color: #f27938;\n    border-color: #f27938;\n    color: #eee\n}\n\n.chart_container.dark #chart_toolpanel .chart_toolpanel_button .chart_toolpanel_icon {\n    background-image: url(" + escape(__webpack_require__(118)) + ")\n}\n\n.chart_container.dark #chart_toolpanel .chart_toolpanel_button.selected .chart_toolpanel_icon {\n    background-image: url(" + escape(__webpack_require__(119)) + ")\n}\n\n.chart_container.dark #chart_toolbar .chart_BoxSize {\n    background: url(" + escape(__webpack_require__(120)) + ") no-repeat;\n}\n\n.chart_container.light #chart_toolpanel .chart_toolpanel_button .chart_toolpanel_icon {\n    background-image: url(" + escape(__webpack_require__(121)) + ")\n}\n\n.chart_container.light #chart_toolpanel .chart_toolpanel_button.selected .chart_toolpanel_icon {\n    background-image: url(" + escape(__webpack_require__(122)) + ")\n}\n\n.chart_container.light #chart_toolbar .chart_BoxSize {\n    background: url(" + escape(__webpack_require__(123)) + ") no-repeat;\n}\n\n.chart_container #chart_toolpanel #chart_Cursor {\n    background-position: 0 0\n}\n\n.chart_container #chart_toolpanel #chart_CrossCursor {\n    background-position: 0 -20px\n}\n\n.chart_container #chart_toolpanel #chart_SegLine {\n    background-position: 0 -40px\n}\n\n.chart_container #chart_toolpanel #chart_StraightLine {\n    background-position: 0 -60px\n}\n\n.chart_container #chart_toolpanel #chart_RayLine {\n    background-position: 0 -100px\n}\n\n.chart_container #chart_toolpanel #chart_ArrowLine {\n    background-position: 0 -80px\n}\n\n.chart_container #chart_toolpanel #chart_HoriSegLine {\n    background-position: 0 -160px\n}\n\n.chart_container #chart_toolpanel #chart_HoriStraightLine {\n    background-position: 0 -120px\n}\n\n.chart_container #chart_toolpanel #chart_HoriRayLine {\n    background-position: 0 -140px\n}\n\n.chart_container #chart_toolpanel #chart_VertiStraightLine {\n    background-position: 0 -180px\n}\n\n.chart_container #chart_toolpanel #chart_PriceLine {\n    background-position: 0 -200px\n}\n\n.chart_container #chart_toolpanel #chart_TriParallelLine {\n    background-position: 0 -220px\n}\n\n.chart_container #chart_toolpanel #chart_BiParallelLine {\n    background-position: 0 -240px\n}\n\n.chart_container #chart_toolpanel #chart_BiParallelRayLine {\n    background-position: 0 -260px\n}\n\n.chart_container .chart_toolpanel_button #chart_DrawFibRetrace {\n    background-position: 0 -280px\n}\n\n.chart_container #chart_toolpanel #chart_DrawFibFans {\n    background-position: 0 -300px\n}\n\n#chart_tabbar {\n    border-top: 1px solid;\n    cursor: default;\n    display: none;\n    *font-weight: bold;\n    height: 22px;\n    overflow: hidden;\n    position: absolute;\n    z-index: 1\n}\n\n#chart_tabbar ul {\n    height: 100%;\n    list-style: none;\n    padding: 0 0 0 4px\n}\n\n#chart_tabbar li {\n    display: inline-block;\n    height: 100%;\n    margin: 0\n}\n\n#chart_tabbar a {\n    cursor: pointer;\n    display: inline-block;\n    height: 100%;\n    margin: 0;\n    padding: 3px 4px 0 4px;\n    overflow: hidden\n}\n\n#chart_tabbar a:hover {\n    text-decoration: none\n}\n\n.chart_container.dark #chart_tabbar {\n    background-color: #0a0a0a;\n    border-top-color: #404040\n}\n\n.chart_container.dark #chart_tabbar a {\n    color: #e5e5e5\n}\n\n.chart_container.dark #chart_tabbar a:hover {\n    background-color: #383838;\n    color: #fff\n}\n\n.chart_container.dark #chart_tabbar a.selected {\n    color: #ffac00\n}\n\n.chart_container.light #chart_tabbar {\n    background-color: #fff;\n    border-top-color: #afb1b3\n}\n\n.chart_container.light #chart_tabbar a {\n    color: #393c40\n}\n\n.chart_container.light #chart_tabbar a:hover {\n    background-color: #f4f4f4;\n    color: #393c40\n}\n\n.chart_container.light #chart_tabbar a.selected {\n    color: #f27935\n}\n\n#chart_canvasGroup {\n    position: absolute;\n    z-index: 0\n}\n\n#chart_mainCanvas {\n    overflow: hidden;\n    position: absolute;\n    z-index: 0\n}\n\n#chart_overlayCanvas {\n    overflow: hidden;\n    position: absolute;\n    z-index: 2\n}\n\n/*\n#chart_loading {\n    border: 1px solid;\n    border-radius: 4px;\n    font-size: 18px;\n    font-weight: bold;\n    line-height: 48px;\n    overflow: hidden;\n    position: absolute;\n    text-align: center;\n    visibility: hidden;\n    width: 200px;\n    z-index: 200\n}\n\n#chart_loading.activated {\n    visibility: visible\n}\n*/\n\n#chart_loading {\n    border: 2px solid #fff;\n    border-left: 2px solid transparent;\n    height: 30px;\n    width: 30px;\n    border-radius: 50%;\n    overflow: hidden;\n    position: absolute;\n    text-align: center;\n    visibility: hidden;\n    z-index: 200;\n}\n\n.chart_str_loading {\n    animation: loading_rotate 1s infinite linear;\n    text-indent: -99999px;\n}\n\n#chart_loading.activated {\n    visibility: visible\n}\n\n@keyframes loading_rotate {\n    0% {\n        transform: rotate(0deg);\n    }\n    100% {\n        transform: rotate(360deg);\n    }\n}\n\n.chart_container.dark #chart_loading {\n    /* border-color: #aaa; */\n    background-color: rgba(0, 0, 0, 0.6);\n    color: #ccc\n}\n\n.chart_container.light #chart_loading {\n    /* border-color: #afb1b3; */\n    background-color: rgba(244, 244, 244, 0.8);\n    color: #393c40\n}\n\n#chart_parameter_settings {\n    border-radius: 4px;\n    border: 1px solid;\n    width: 640px;\n    position: absolute;\n    overflow: hidden;\n    visibility: hidden;\n    z-index: 500\n}\n\n#chart_parameter_settings.clicked {\n    visibility: visible\n}\n\n#chart_parameter_settings h2 {\n    padding: 8px 12px;\n    margin: 0\n}\n\n#chart_parameter_settings table {\n    border-collapse: collapse;\n    width: 100%\n}\n\n#chart_parameter_settings tr {\n    line-height: 32px\n}\n\n#chart_parameter_settings th {\n    text-align: right;\n    padding: 0 4px 0 16px\n}\n\n#chart_parameter_settings input {\n    width: 2em;\n    margin: 0 2px 0 2px\n}\n\n#chart_parameter_settings #close_settings {\n    border-radius: 4px;\n    cursor: pointer;\n    font-weight: bold;\n    text-align: center;\n    margin: 8px auto;\n    padding: 5px 24px 5px 24px;\n    width: 84px\n}\n\n#chart_parameter_settings .chart_str_default {\n    margin-right: 24px\n}\n\n.chart_container.dark #chart_parameter_settings {\n    background-color: rgba(0, 0, 0, 0.9);\n    border-color: rgba(0, 0, 0, 0.9);\n    color: #ccc;\n}\n\n.chart_container.dark #chart_parameter_settings #close_settings {\n    background: #1887da;\n    color: #eee\n}\n\n.chart_container.light #chart_parameter_settings {\n    background-color: rgba(244, 244, 244, 0.8);\n    border-color: #afb1b3;\n    color: #393c40\n}\n\n.chart_container.light #chart_parameter_settings #close_settings {\n    background: #1478c8;\n    color: #eee\n}\n\n.chart_container input, .chart_container button {\n    border-radius: 4px;\n    border: 1px solid;\n    padding: 4px\n}\n\n.chart_container input[type=text] {\n    width: 12em\n}\n\n.chart_container input[type=button], .chart_container input[type=submit], .chart_container button {\n    font-family: arial, sans, serif;\n    padding: 4px 8px;\n    cursor: pointer\n}\n\n.chart_container.dark input, .chart_container.dark button {\n    background-color: #151515;\n    border-color: #333;\n    color: #ccc\n}\n\n.chart_container.light input, .chart_container.light button {\n    background-color: #ddd;\n    border-color: #ddd;\n    color: #222\n}\n\n/* .trade_container {\n    width: 250px;\n    height: 100%;\n    float: right;\n    z-index: 99999;\n    font-size: 12px;\n    overflow: hidden\n} */\n\n.trade_container {\n    width: 100%;\n    height: auto;\n    z-index: 99999;\n    font-size: 12px;\n    overflow: hidden;\n    padding-bottom: 15px;\n}\n\n.trade_container.dark {\n    background: #0a0a0a;\n    color: #f1f1f1\n}\n\n.m_righttop {\n    position: fixed;\n    top: 0;\n    height: 41px;\n    line-height: 41px;\n    width: 230px;\n    text-align: right;\n    padding-right: 20px;\n    font-size: 16px;\n    color: #f78d15;\n    font-family: Gotham, \"Helvetica Neue\", Helvetica, Arial, sans-serif\n}\n\n.m_righttop em {\n    width: 123px;\n    height: 28px;\n    background-position: 0 0;\n    display: block;\n    float: right;\n    margin-top: 5px\n}\n\n.dark .m_righttop em {\n    background-position: 0 0\n}\n\n.m_rightbot {\n    height: 22px;\n    line-height: 22px;\n    border-top: 1px solid #404040;\n    width: 230px;\n    text-align: right;\n    padding-right: 20px;\n    background-color: #0a0a0a;\n    border-bottom-color: #404040\n}\n\n/* \n.m_guadan {\n    margin-top: 29px;\n    overflow: hidden;\n    border-left: 1px solid #404040;\n    border-top: 1px solid #404040\n} */\n\n.m_guadan {\n    padding: 0 10px;\n    margin-top: 0px;\n    overflow: hidden;\n    border-left: 1px solid #404040;\n    border-top: 1px solid #404040\n}\n\n.m_guadan a {\n    font-weight: bold;\n    color: #FFF;\n    text-decoration: none\n}\n\n/* .light .m_guadan {\n    margin-top: 29px;\n    overflow: hidden;\n    border-left: 1px solid #afb1b3;\n    border-top: 1px solid #afb1b3\n} */\n\n.light .m_guadan {\n    margin-top: 0px;\n    overflow: hidden;\n    border-left: 1px solid #afb1b3;\n    border-top: 1px solid #afb1b3\n}\n\n#trades, #description {\n    display: none;\n}\n\n/* #orderbook #asks, #orderbook #gasks, #orderbook #bids, #orderbook #gbids {\n    height: 195px;\n    position: relative;\n    display: inline-block;\n    overflow: hidden\n} */\n\n#orderbook #asks, #orderbook #gasks, #orderbook #bids, #orderbook #gbids {\n    height: 195px;\n    position: relative;\n    overflow: hidden\n}\n#asks\n{\n    left: 25px;\n}\n\n/* .symbol-title {\n    font-size: 14px;\n    font-weight: bold;\n    text-align: center;\n    height: 16px;\n    line-height: 16px;\n    font-family: Arial, sans, serif;\n    padding: 5px\n} */\n\n.symbol-title {\n    font-size: 16px;\n    font-weight: bold;\n    text-align: center;\n    height: 24px;\n    line-height: 24px;\n    font-family: Arial, sans, serif;\n    padding: 5px\n}\n\n.symbol-title .dark {\n    color: #6BF\n}\n\n.symbol-title .white {\n    color: #FFF;\n    text-decoration:none;\n}\n\n.symbol-title .infoDepth {\n    margin-left: 8px;\n    color: #f78d15\n}\n\n.symbol-title a:hover {\n    text-decoration: underline\n}\n\n/* #asks, #bids {\n    width: 150px\n} */\n\n\n#asks, #bids {\n    flex: 1;\n}\n\n\n/* #orderbook {\n    padding-left: 3px;\n    border-bottom: 1px solid #222;\n    padding-bottom: 2px;\n    margin-left: 5px;\n    margin-bottom: 2px\n} */\n\n#orderbook {\n    display: flex;\n}\n\n#asks, #bids {\n    flex: 1;\n}\n\n#tabList {\n    display: flex;\n}\n\n#tabList li {\n    flex: 1;\n    text-align: center;\n    line-height: 30px;\n}\n\n#tabList li.current {\n    color: #0F0;\n}\n\n#orderbook .table {\n    position: absolute;\n    border-collapse: collapse;\n    padding: 0;\n    margin: 0\n}\n\n#gasks .table, #asks .table {\n    bottom: 0\n}\n\n#orderbook .table .row {\n    padding: 0;\n    margin: 0;\n    height: 13px;\n    line-height: 13px;\n    font-family: Consolas, monospace\n}\n\n#orderbook .table .row {\n    line-height: 13px\n}\n\n#orderbook .table .g {\n    color: #666\n}\n\n#gasks, #gbids {\n    width: 80px\n}\n\n#gasks .amount, #gbids .amount {\n    float: right\n}\n\n#gasks .price, #gbids .price {\n    float: left;\n    text-align: right\n}\n\n.price {\n    margin-right: 10px\n}\n\n.price h {\n    visibility: hidden\n}\n\n.price g, .amount g {\n    color: #666\n}\n\n#price {\n    text-align: center;\n    font-size: 16px;\n    font-weight: bold;\n    height: 25px;\n    line-height: 25px\n}\n\n.chart_trade_quotation {\n    height: 76px;\n    background-color: #0a0a0a;\n    position: relative;\n}\n\n#chart_trade_quotation_content ul, li {\n    list-style: none;\n    padding: 0;\n    margin: 0;\n}\n\n.chart_trade_quotation .green {\n    color: #0F0\n}\n\n.chart_trade_quotation .red {\n    color: #F00\n}\n\n#chart_trade_quotation_content li {\n    position: absolute;\n    display: block;\n    font-size: 12px;\n}\n\n#chart_trade_quotation_content li:nth-of-type(1) {\n    left: 20px;\n    top: 24px;\n}\n\n#chart_trade_quotation_content li:nth-of-type(2) {\n    left: 26px;\n    top: 49px;\n    color: whitesmoke;\n}\n\n#chart_trade_quotation_content li:nth-of-type(3) {\n    right: 10px;\n    top: 10px;\n    color: goldenrod;\n}\n\n#chart_trade_quotation_content li:nth-of-type(4) {\n    color: yellowgreen;\n    top: 28px;\n    right: 10px;\n}\n\n#chart_trade_quotation_content li:nth-of-type(5) {\n    color: orchid;\n    top: 49px;\n    right: 10px;\n}\n\n.trade_container .green {\n    color: #0F0\n}\n\n.trade_container .red {\n    color: #F00\n}\n\n.trade_container.dark #orderbook div.table div.remove g, .trade_container.dark #orderbook div.table div.remove span {\n    color: #444\n}\n\n.trade_container.light #orderbook div.table div.remove g, .trade_container.light #orderbook div.table div.remove span {\n    color: #ddd\n}\n\n.trade_container.dark #orderbook div.table div.add {\n    display: none;\n    background-color: rgba(238, 238, 238, 0.2)\n}\n\n.trade_container.light #orderbook div.table div.add {\n    display: none;\n    background-color: rgba(100, 100, 100, 0.2)\n}\n/* \n#trades {\n    overflow-y: auto;\n    text-align: left;\n    color: #666;\n    padding-top: 5px\n} */\n\n\n#trades {\n    overflow-y: auto;\n    text-align: left;\n    color: #666;\n}\n\n.trade_container.light {\n    background: #fff;\n    border-left: 1px solid #afb1b3;\n    color: #000\n}\n\n.trade_container.light .m_righttop em {\n    background-position: 0 -32px\n}\n\n.trade_container.light .m_righttop {\n    position: fixed;\n    top: 0;\n    height: 40px;\n    line-height: 40px;\n    background: #FFF;\n    width: 230px;\n    border-bottom: 1px solid #afb1b3;\n    text-align: right;\n    padding-right: 20px\n}\n\n.trade_container.light #trades.trades table {\n    color: #333\n}\n\n.trade_container.light #trades.trades .v {\n    color: #333\n}\n\n.trade_container.light #trades.trades .v g {\n    color: #333\n}\n\n.trade_container.light .m_rightbot {\n    background: #fff;\n    border-top: 1px solid #afb1b3\n}\n\n.trade_container.light #orderbook {\n    border-bottom: 1px solid #afb1b3\n}\n\n/* .trades_list {\n    padding-left: 25px\n}\n\n.trades_list ul {\n    width: 200px;\n    height: 14px;\n    line-height: 14px;\n    text-align: left;\n    list-style: none;\n    clear: both;\n    zoom: 1;\n    margin: 0;\n    padding: 0\n} */\n\n.trades_list {\n    padding-left: 25px\n}\n\n.trades_list ul {\n    width: 100%;\n    height: 14px;\n    line-height: 14px;\n    text-align: left;\n    list-style: none;\n    clear: both;\n    zoom: 1;\n    margin: 0;\n    padding: 0;\n    display: flex;\n}\n\n/* .trades_list ul li {\n    height: 14px;\n    line-height: 14px;\n    color: #999;\n    font-size: 12px;\n    list-style: none;\n    float: left;\n    *display: inline;\n    margin: 0;\n    padding: 0;\n    font-family: Consolas, monospace\n} */\n\n.trades_list ul li {\n    height: 14px;\n    line-height: 14px;\n    color: #999;\n    font-size: 12px;\n    list-style: none;\n    float: left;\n    *display: inline;\n    margin: 0;\n    padding: 0;\n    font-family: Consolas, monospace;\n    flex: 1;\n}\n\n.trades_list ul li.tm {\n    width: 62px;\n    color: #999\n}\n\n.trades_list ul li.pr-green {\n    width: 65px;\n    color: #6c6\n}\n\n.trades_list ul li.pr-red {\n    width: 65px;\n    color: #c66\n}\n\n.trades_list ul li.vl {\n    width: 60px;\n    color: #ccc\n}\n\n.trades_list ul li.vl g {\n    color: #666\n}\n\n.trade_container.dark .trades_list ul.newul {\n    display: none;\n    background-color: rgba(238, 238, 238, 0.2)\n}\n\n.trade_container.light .trades_list ul.newul {\n    display: none;\n    background-color: rgba(100, 100, 100, 0.2)\n}\n\n.light .trades_list ul li.tm {\n    color: #333\n}\n\n.light .trades_list ul li.pr-green {\n    color: #6c6\n}\n\n.light .trades_list ul li.pr-red {\n    color: #c66\n}\n\n.light .trades_list ul li.vl {\n    color: #333\n}\n\n.light .trades_list ul li.vl g {\n    color: #333\n}\n\n.container .nav {\n    margin: 0;\n    list-style: none;\n    padding: 0 0 0 3px;\n    height: 41px\n}\n\n.container .nav li {\n    display: inline-block;\n    margin-right: 9px\n}\n\n.container a {\n    text-decoration: none;\n    color: #6BF;\n    font-family: Arial, sans, serif\n}\n\n.container a:hover {\n    text-decoration: underline\n}\n\n.container a.active {\n    color: #FC9\n}\n\n.container span {\n    margin-left: 3px;\n    font-family: Consolas, monospace;\n    color: #ccc\n}\n\n.light .container span {\n    color: #333\n}\n\n.light .container a {\n    text-decoration: none;\n    color: #1478c8;\n    font-family: Arial, sans, serif\n}\n\n.chart_BoxSize {\n    width: 20px;\n    height: 20px\n}\n\n\n/* #chart_main_indicator {\n    float: right;\n    right: 12px;\n} */\n\n#chart_main_indicator li {\n    line-height: 24px;\n    display: block;\n}", ""]);
 
 // exports
 
@@ -35250,7 +35377,7 @@ var util_3 = __webpack_require__(0);
 var ImmutableTree_1 = __webpack_require__(47);
 var ListenComplete_1 = __webpack_require__(162);
 var Merge_1 = __webpack_require__(163);
-var Operation_1 = __webpack_require__(14);
+var Operation_1 = __webpack_require__(15);
 var Overwrite_1 = __webpack_require__(83);
 var Path_1 = __webpack_require__(2);
 var SyncPoint_1 = __webpack_require__(84);
@@ -35962,7 +36089,7 @@ exports.SyncTree = SyncTree;
 Object.defineProperty(exports, "__esModule", { value: true });
 var util_1 = __webpack_require__(0);
 var Path_1 = __webpack_require__(2);
-var Operation_1 = __webpack_require__(14);
+var Operation_1 = __webpack_require__(15);
 var AckUserWrite = /** @class */ (function () {
     /**
      *
@@ -36030,7 +36157,7 @@ exports.AckUserWrite = AckUserWrite;
  */
 Object.defineProperty(exports, "__esModule", { value: true });
 var Path_1 = __webpack_require__(2);
-var Operation_1 = __webpack_require__(14);
+var Operation_1 = __webpack_require__(15);
 /**
  * @param {!OperationSource} source
  * @param {!Path} path
@@ -36081,7 +36208,7 @@ exports.ListenComplete = ListenComplete;
  * limitations under the License.
  */
 Object.defineProperty(exports, "__esModule", { value: true });
-var Operation_1 = __webpack_require__(14);
+var Operation_1 = __webpack_require__(15);
 var Overwrite_1 = __webpack_require__(83);
 var Path_1 = __webpack_require__(2);
 var util_1 = __webpack_require__(0);
@@ -36175,7 +36302,7 @@ var CacheNode_1 = __webpack_require__(35);
 var ViewCache_1 = __webpack_require__(85);
 var EventGenerator_1 = __webpack_require__(168);
 var util_1 = __webpack_require__(0);
-var Operation_1 = __webpack_require__(14);
+var Operation_1 = __webpack_require__(15);
 var Change_1 = __webpack_require__(18);
 var PriorityIndex_1 = __webpack_require__(5);
 /**
@@ -36383,7 +36510,7 @@ exports.View = View;
  * limitations under the License.
  */
 Object.defineProperty(exports, "__esModule", { value: true });
-var Operation_1 = __webpack_require__(14);
+var Operation_1 = __webpack_require__(15);
 var util_1 = __webpack_require__(0);
 var ChildChangeAccumulator_1 = __webpack_require__(166);
 var Change_1 = __webpack_require__(18);
@@ -39872,7 +39999,7 @@ var Tree_1 = __webpack_require__(184);
 var PriorityIndex_1 = __webpack_require__(5);
 var util_2 = __webpack_require__(1);
 var ServerValues_1 = __webpack_require__(80);
-var validation_1 = __webpack_require__(13);
+var validation_1 = __webpack_require__(14);
 var util_3 = __webpack_require__(0);
 var nodeFromJSON_1 = __webpack_require__(24);
 var ChildrenNode_1 = __webpack_require__(6);
@@ -40877,7 +41004,7 @@ registerMessaging(__WEBPACK_IMPORTED_MODULE_2__firebase_app__["firebase"]);
 "use strict";
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_tslib__ = __webpack_require__(3);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__controller_interface__ = __webpack_require__(94);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__models_errors__ = __webpack_require__(15);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__models_errors__ = __webpack_require__(16);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__models_worker_page_message__ = __webpack_require__(98);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__models_default_sw__ = __webpack_require__(193);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__models_notification_permission__ = __webpack_require__(97);
@@ -41263,7 +41390,7 @@ var WindowController = /** @class */ (function (_super) {
 "use strict";
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_tslib__ = __webpack_require__(3);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__db_interface__ = __webpack_require__(95);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__errors__ = __webpack_require__(15);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__errors__ = __webpack_require__(16);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__helpers_array_buffer_to_base64__ = __webpack_require__(51);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__clean_v1_undefined__ = __webpack_require__(191);
 /**
@@ -41639,7 +41766,7 @@ function cleanV1() {
 "use strict";
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_tslib__ = __webpack_require__(3);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__db_interface__ = __webpack_require__(95);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__errors__ = __webpack_require__(15);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__errors__ = __webpack_require__(16);
 /**
  * Copyright 2017 Google Inc.
  *
@@ -41842,7 +41969,7 @@ var VapidDetailsModel = /** @class */ (function (_super) {
 "use strict";
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_tslib__ = __webpack_require__(3);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__controller_interface__ = __webpack_require__(94);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__models_errors__ = __webpack_require__(15);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__models_errors__ = __webpack_require__(16);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__models_fcm_details__ = __webpack_require__(52);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__models_worker_page_message__ = __webpack_require__(98);
 /**
@@ -42307,7 +42434,7 @@ var XhrIoPool = /** @class */ (function () {
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return NetworkXhrIo; });
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__error__ = __webpack_require__(10);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__object__ = __webpack_require__(19);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__promise_external__ = __webpack_require__(16);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__promise_external__ = __webpack_require__(17);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__type__ = __webpack_require__(8);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__xhrio__ = __webpack_require__(99);
 /**
@@ -42617,7 +42744,7 @@ var RequestInfo = /** @class */ (function () {
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__implementation_array__ = __webpack_require__(56);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__implementation_async__ = __webpack_require__(206);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_6__implementation_error__ = __webpack_require__(10);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_7__implementation_promise_external__ = __webpack_require__(16);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_7__implementation_promise_external__ = __webpack_require__(17);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_8__implementation_requests__ = __webpack_require__(103);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_9__implementation_type__ = __webpack_require__(8);
 /**
@@ -43280,7 +43407,7 @@ var UploadTaskSnapshot = /** @class */ (function () {
 
 "use strict";
 /* harmony export (immutable) */ __webpack_exports__["a"] = async;
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__promise_external__ = __webpack_require__(16);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__promise_external__ = __webpack_require__(17);
 /**
  * Copyright 2017 Google Inc.
  *
@@ -43330,7 +43457,7 @@ function async(f) {
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__implementation_args__ = __webpack_require__(53);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__implementation_authwrapper__ = __webpack_require__(208);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__implementation_location__ = __webpack_require__(37);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__implementation_promise_external__ = __webpack_require__(16);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__implementation_promise_external__ = __webpack_require__(17);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__implementation_request__ = __webpack_require__(211);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__reference__ = __webpack_require__(100);
 /**
@@ -43491,7 +43618,7 @@ var ServiceInternals = /** @class */ (function () {
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__error__ = __webpack_require__(10);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__failrequest__ = __webpack_require__(209);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__location__ = __webpack_require__(37);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__promise_external__ = __webpack_require__(16);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__promise_external__ = __webpack_require__(17);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__requestmap__ = __webpack_require__(210);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_6__type__ = __webpack_require__(8);
 
@@ -43623,7 +43750,7 @@ var AuthWrapper = /** @class */ (function () {
 
 "use strict";
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return FailRequest; });
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__promise_external__ = __webpack_require__(16);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__promise_external__ = __webpack_require__(17);
 
 /**
  * A request whose promise always fails.
@@ -43729,7 +43856,7 @@ var RequestMap = /** @class */ (function () {
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__backoff__ = __webpack_require__(212);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__error__ = __webpack_require__(10);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__object__ = __webpack_require__(19);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__promise_external__ = __webpack_require__(16);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__promise_external__ = __webpack_require__(17);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_6__type__ = __webpack_require__(8);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_7__url__ = __webpack_require__(55);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_8__xhrio__ = __webpack_require__(99);

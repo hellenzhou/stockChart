@@ -628,205 +628,292 @@ export class Control {
         //Kline.instance.showTrade ? (width - Kline.instance.tradeWidth) : width;
         //modify 右侧的行情面板
         let height = h || window.innerHeight;
-
         let remainHeight = height;
-        if (Kline.instance.showTrade && !isNaN(Kline.instance.tradeHeight)) {
-            remainHeight -= Kline.instance.tradeHeight;
-        }
-
-        let container = $(Kline.instance.element);
-        container.css({
-            width: width + 'px',
-            height: height + 'px'
-        });
-        let toolBar = $('#chart_toolbar');
-        let toolPanel = $('#chart_toolpanel');
-        let canvasGroup = $('#chart_canvasGroup');
-        let tabBar = $('#chart_tabbar');
-        let toolPanelShown = toolPanel[0].style.display !== 'inline' ? false : true;
-        let tabBarShown = tabBar[0].style.display !== 'block' ? false : true;
-        let toolBarRect = {};
-        toolBarRect.x = 0;
-        toolBarRect.y = 0;
-        toolBarRect.w = chartWidth;
-        toolBarRect.h = 29;
-        let toolPanelRect = {};
-        toolPanelRect.x = 0;
-        toolPanelRect.y = toolBarRect.h + 1;
-        toolPanelRect.w = toolPanelShown ? 32 : 0;
-        toolPanelRect.h = remainHeight - toolPanelRect.y;
-
-        let tabBarRect = {};
-        tabBarRect.w = toolPanelShown ? chartWidth - (toolPanelRect.w + 1) : chartWidth;
-        tabBarRect.h = tabBarShown ? 22 : -1;
-        tabBarRect.x = chartWidth - tabBarRect.w;
-        tabBarRect.y = remainHeight - (tabBarRect.h + 1);
-        let canvasGroupRect = {};
-        canvasGroupRect.x = tabBarRect.x;
-        canvasGroupRect.y = toolPanelRect.y;
-        canvasGroupRect.w = tabBarRect.w;
-        canvasGroupRect.h = tabBarRect.y - toolPanelRect.y;
-
-        toolBar.css({
-            left: toolBarRect.x + 'px',
-            top: toolBarRect.y + 'px',
-            width: toolBarRect.w + 'px',
-            height: toolBarRect.h + 'px'
-        });
-        if (toolPanelShown) {
-            toolPanel.css({
-                left: toolPanelRect.x + 'px',
-                top: toolPanelRect.y + 'px',
-                width: toolPanelRect.w + 'px',
-                height: toolPanelRect.h + 'px'
-            });
-        }
-
-        canvasGroup.css({
-            left: canvasGroupRect.x + 'px',
-            top: canvasGroupRect.y + 'px',
-            width: canvasGroupRect.w + 'px',
-            height: canvasGroupRect.h + 'px'
-        });
-        let mainCanvas = $('#chart_mainCanvas')[0];
-        let overlayCanvas = $('#chart_overlayCanvas')[0];
-
-        let devicePixelRatio = window.devicePixelRatio;
-        let context = mainCanvas.getContext("2d");
-        let backingStoreRatio = context.webkitBackingStorePixelRatio ||
-            context.mozBackingStorePixelRatio ||
-            context.msBackingStorePixelRatio ||
-            context.oBackingStorePixelRatio ||
-            context.backingStorePixelRatio || 1;
-
-
-        let ratio = devicePixelRatio / backingStoreRatio;
-        Kline.instance.deviceRatio = ratio;
-
-        mainCanvas.width = canvasGroupRect.w * ratio;
-        mainCanvas.height = canvasGroupRect.h * ratio;
-        overlayCanvas.width = canvasGroupRect.w * ratio;;
-        overlayCanvas.height = canvasGroupRect.h * ratio;;
-
-        mainCanvas.style.width = canvasGroupRect.w + 'px';
-        mainCanvas.style.height = canvasGroupRect.h + "px";
-        overlayCanvas.style.width = canvasGroupRect.w + 'px';
-        overlayCanvas.style.height = canvasGroupRect.h + 'px';
-
-        if (tabBarShown) {
-            tabBar.css({
-                left: tabBarRect.x + 'px',
-                top: tabBarRect.y + 'px',
-                width: tabBarRect.w + 'px',
-                height: tabBarRect.h + 'px'
-            });
-        }
-
-        let dlgSettings = $("#chart_parameter_settings");
-
-        dlgSettings.css({
-            left: (chartWidth - dlgSettings.width()) >> 1,
-            top: (height - dlgSettings.height()) >> 1,
-            display: 'none'
-        });
-
-        let dlgLoading = $("#chart_loading");
-        dlgLoading.css({
-            left: (chartWidth - dlgLoading.width()) >> 1,
-            top: (height - dlgLoading.height()) >> 2
-        });
-        let domElemCache = $('#chart_dom_elem_cache');
-        let rowTheme = $('#chart_select_theme')[0];
-        let rowTools = $('#chart_enable_tools')[0];
-        let rowIndic = $('#chart_enable_indicator')[0];
-        // modify
-        let periodsVert = $('#chart_toolbar_periods_vert'); //周期
-        let periodsHorz = $('#chart_toolbar_periods_horz')[0]; // 分时 5 分钟
-        let mainIndicator = $('#chart_main_indicator')[0]; //指标
-        let sizeIcon = $('#chart_updated_time')[0];
-        let chatPeriodToolRanages = [];
-        // 根据时间计算显示个数
-        let ranges = Kline.instance.ranges;
-        let periodShowWidth = chartWidth - mainIndicator.offsetWidth -4 - periodsVert[0].offsetWidth - sizeIcon.offsetWidth;
-        let totalCount = ranges.length;
-        let showCount = totalCount;
-        let totalWidth = 0;
-
-        for (let i = 0; i < totalCount; i++) {
-            let dom = $('#chart_period_' + ranges[i] + '_h');
-            dom.show();
-            totalWidth += dom.width();
-            if (totalWidth > periodShowWidth - periodsVert.width()) {
-                dom.hide();
-                showCount--;
-            } else {
-                chatPeriodToolRanages.push(ranges[i])
+        //modify
+        if (w < h) {
+            if (Kline.instance.showTrade && !isNaN(Kline.instance.tradeHeight)) {
+                remainHeight -= Kline.instance.tradeHeight;
             }
-        }
 
-        debugger
-        if (showCount < ranges.length) {
-            periodsVert.show();
-            Kline.instance.periodsVertDisplayNone(chatPeriodToolRanages);
+            let container = $(Kline.instance.element);
+            container.css({
+                width: width + 'px',
+                height: height + 'px'
+            });
+
+            // modify add
+            let chart_trade_quotation = $('.chart_trade_quotation');
+            chart_trade_quotation.css({
+                height: '86px',
+                backgroundColor: '#0a0a0a',
+                position: 'relative'
+            });
+
+            // modify 
+            let toolBar = $('#chart_toolbar');
+            toolBar.show();
+            let toolPanel = $('#chart_toolpanel');
+            let canvasGroup = $('#chart_canvasGroup');
+            let tabBar = $('#chart_tabbar');
+            tabBar.show();
+            let toolPanelShown = toolPanel[0].style.display !== 'inline' ? false : true;
+            let tabBarShown = tabBar[0].style.display !== 'block' ? false : true;
+            let toolBarRect = {};
+            toolBarRect.x = 0;
+            toolBarRect.y = 0;
+            toolBarRect.w = chartWidth;
+            toolBarRect.h = 29;
+            let toolPanelRect = {};
+            toolPanelRect.x = 0;
+            toolPanelRect.y = toolBarRect.h + 1;
+            toolPanelRect.w = toolPanelShown ? 32 : 0;
+            toolPanelRect.h = remainHeight - toolPanelRect.y;
+
+            let tabBarRect = {};
+            tabBarRect.w = toolPanelShown ? chartWidth - (toolPanelRect.w + 1) : chartWidth;
+            tabBarRect.h = tabBarShown ? 22 : -1;
+            tabBarRect.x = chartWidth - tabBarRect.w;
+            tabBarRect.y = remainHeight - (tabBarRect.h + 1);
+            let canvasGroupRect = {};
+            canvasGroupRect.x = tabBarRect.x;
+            canvasGroupRect.y = toolPanelRect.y;
+            canvasGroupRect.w = tabBarRect.w;
+            canvasGroupRect.h = tabBarRect.y - toolPanelRect.y;
+
+            toolBar.css({
+                left: toolBarRect.x + 'px',
+                top: toolBarRect.y + 'px',
+                width: toolBarRect.w + 'px',
+                height: toolBarRect.h + 'px'
+            });
+            if (toolPanelShown) {
+                toolPanel.css({
+                    left: toolPanelRect.x + 'px',
+                    top: toolPanelRect.y + 'px',
+                    width: toolPanelRect.w + 'px',
+                    height: toolPanelRect.h + 'px'
+                });
+            }
+
+            canvasGroup.css({
+                left: canvasGroupRect.x + 'px',
+                top: canvasGroupRect.y + 'px',
+                width: canvasGroupRect.w + 'px',
+                height: canvasGroupRect.h + 'px'
+            });
+            let mainCanvas = $('#chart_mainCanvas')[0];
+            let overlayCanvas = $('#chart_overlayCanvas')[0];
+
+            let devicePixelRatio = window.devicePixelRatio;
+            let context = mainCanvas.getContext("2d");
+            let backingStoreRatio = context.webkitBackingStorePixelRatio ||
+                context.mozBackingStorePixelRatio ||
+                context.msBackingStorePixelRatio ||
+                context.oBackingStorePixelRatio ||
+                context.backingStorePixelRatio || 1;
+
+
+            let ratio = devicePixelRatio / backingStoreRatio;
+            Kline.instance.deviceRatio = ratio;
+
+            mainCanvas.width = canvasGroupRect.w * ratio;
+            mainCanvas.height = canvasGroupRect.h * ratio;
+            overlayCanvas.width = canvasGroupRect.w * ratio;;
+            overlayCanvas.height = canvasGroupRect.h * ratio;;
+
+            mainCanvas.style.width = canvasGroupRect.w + 'px';
+            mainCanvas.style.height = canvasGroupRect.h + "px";
+            overlayCanvas.style.width = canvasGroupRect.w + 'px';
+            overlayCanvas.style.height = canvasGroupRect.h + 'px';
+
+            if (tabBarShown) {
+                tabBar.css({
+                    left: tabBarRect.x + 'px',
+                    top: tabBarRect.y + 'px',
+                    width: tabBarRect.w + 'px',
+                    height: tabBarRect.h + 'px'
+                });
+            }
+
+
+            let dlgSettings = $("#chart_parameter_settings");
+
+            dlgSettings.css({
+                left: (chartWidth - dlgSettings.width()) >> 1,
+                top: (height - dlgSettings.height()) >> 1,
+                display: 'none'
+            });
+
+            let dlgLoading = $("#chart_loading");
+            dlgLoading.css({
+                left: (chartWidth - dlgLoading.width()) >> 1,
+                top: (height - dlgLoading.height()) >> 2
+            });
+            let domElemCache = $('#chart_dom_elem_cache');
+            let rowTheme = $('#chart_select_theme')[0];
+            let rowTools = $('#chart_enable_tools')[0];
+            let rowIndic = $('#chart_enable_indicator')[0];
+            // modify
+            let periodsVert = $('#chart_toolbar_periods_vert'); //周期
+            let periodsHorz = $('#chart_toolbar_periods_horz')[0]; // 分时 5 分钟
+            let mainIndicator = $('#chart_main_indicator')[0]; //指标
+            let sizeIcon = $('#chart_updated_time')[0];
+            let chatPeriodToolRanages = [];
+            // 根据时间计算显示个数
+            let ranges = Kline.instance.ranges;
+            let periodShowWidth = chartWidth - mainIndicator.offsetWidth - 4 - periodsVert[0].offsetWidth - sizeIcon.offsetWidth;
+            let totalCount = ranges.length;
+            let showCount = totalCount;
+            let totalWidth = 0;
+
+            for (let i = 0; i < totalCount; i++) {
+                let dom = $('#chart_period_' + ranges[i] + '_h');
+                dom.show();
+                totalWidth += dom.width();
+                if (totalWidth > periodShowWidth - periodsVert.width()) {
+                    dom.hide();
+                    showCount--;
+                } else {
+                    chatPeriodToolRanages.push(ranges[i])
+                }
+            }
+
+            if (showCount < ranges.length) {
+                periodsVert.show();
+                Kline.instance.periodsVertDisplayNone(chatPeriodToolRanages);
+            } else {
+                periodsVert.hide();
+            }
+
+            /////
+
+            let showIndic = $('#chart_show_indicator')[0];
+            let showTools = $('#chart_show_tools')[0];
+            let selectTheme = $('#chart_toolbar_theme')[0];
+
+            let dropDownSettings = $('#chart_dropdown_settings');
+
+            dropDownSettings.css('display', "none");
+            $("#chart_language_setting_div").css('display', "none");
+
+            let periodsVertNW = periodsVert[0].offsetWidth;
+            let periodsHorzNW = periodsVertNW + periodsHorz.offsetWidth;
+            let showIndicNW = periodsHorzNW + showIndic.offsetWidth + 4;
+            let showToolsNW = showIndicNW + showTools.offsetWidth + 4;
+            let selectThemeNW = showToolsNW + selectTheme.offsetWidth;
+            let dropDownSettingsW = dropDownSettings.find(".chart_dropdown_t")[0].offsetWidth + 150;
+            periodsVertNW += dropDownSettingsW;
+            periodsHorzNW += dropDownSettingsW;
+            showIndicNW += dropDownSettingsW;
+            showToolsNW += dropDownSettingsW;
+            selectThemeNW += dropDownSettingsW;
+
+            // if (chartWidth < periodsHorzNW) {
+            //     domElemCache.append(periodsHorz);
+            // } else {
+            //     periodsVert.after(periodsHorz);
+            // }
+            if (chartWidth < showIndicNW) {
+                domElemCache.append(showIndic);
+                rowIndic.style.display = "";
+            } else {
+                dropDownSettings.before(showIndic);
+                rowIndic.style.display = "none";
+            }
+            if (chartWidth < showToolsNW) {
+                domElemCache.append(showTools);
+                rowTools.style.display = "";
+            } else {
+                dropDownSettings.before(showTools);
+                rowTools.style.display = "none";
+            }
+            if (chartWidth < selectThemeNW) {
+                domElemCache.append(selectTheme);
+                rowTheme.style.display = "";
+            } else {
+                dropDownSettings.before(selectTheme);
+                rowTheme.style.display = "none";
+            }
+
         } else {
-            periodsVert.hide();
+            let portraitWidth = height;
+            let portraitHeight = width;
+            let container = $(Kline.instance.element);
+
+            container.css({
+                width: portraitWidth + 'px',
+                height: portraitHeight + 'px'
+            });
+
+            let topSidebar = 38, bottomSidebar = 38;
+            let portraitRemainWidth = portraitWidth - topSidebar - bottomSidebar;
+
+            let toolBar = $('#chart_toolbar');
+            let toolPanel = $('#chart_toolpanel');
+
+            toolBar.hide();
+            let canvasGroup = $('#chart_canvasGroup');
+            let tabBar = $('#chart_tabbar');
+            tabBar.hide();
+
+
+            let canvasGroupRect = {};
+            canvasGroupRect.x = 0;
+            canvasGroupRect.y = 0;
+            canvasGroupRect.w = 414;
+            canvasGroupRect.h = portraitHeight;
+            canvasGroup.css({
+                left: canvasGroupRect.x + 'px',
+                top: canvasGroupRect.y + 'px',
+                width: canvasGroupRect.w + 'px',
+                height: canvasGroupRect.h + 'px',
+                backgroundColor: 'red'
+            });
+
+            let mainCanvas = $('#chart_mainCanvas')[0];
+            let overlayCanvas = $('#chart_overlayCanvas')[0];
+
+            let devicePixelRatio = window.devicePixelRatio;
+            let context = mainCanvas.getContext("2d");
+
+            let backingStoreRatio = context.webkitBackingStorePixelRatio ||
+                context.mozBackingStorePixelRatio ||
+                context.msBackingStorePixelRatio ||
+                context.oBackingStorePixelRatio ||
+                context.backingStorePixelRatio || 1;
+
+
+            let ratio = devicePixelRatio / backingStoreRatio;
+            Kline.instance.deviceRatio = ratio;
+
+
+            mainCanvas.width = canvasGroupRect.w * ratio;
+            mainCanvas.height = canvasGroupRect.h * ratio;
+
+            overlayCanvas.width = canvasGroupRect.w * ratio;;
+            overlayCanvas.height = canvasGroupRect.h * ratio;;
+
+            mainCanvas.style.width = canvasGroupRect.w + 'px';
+            mainCanvas.style.height = canvasGroupRect.h + "px";
+
+            overlayCanvas.style.width = canvasGroupRect.w + 'px';
+            overlayCanvas.style.height = canvasGroupRect.h + 'px';
+            // mainCanvas.style.overflow = 'scroll';
+
+            let overlayerContext = overlayCanvas.getContext("2d");
+
+            context.setTransform(1, 0, 0, 1, 0, 0);
+            //  //   overlayerContext.setTransform(1,0,0,1,0,0);
+
+            let centerX = portraitWidth / 2 * ratio;
+            let centerY = portraitHeight / 2 * ratio;
+debugger
+            context.translate(centerX, centerY);
+            context.rotate(90 * Math.PI / 180);
+        
+ 
+           ChartManager.instance.setxy(-centerY,-centerX );
         }
-
-        /////
-
-        let showIndic = $('#chart_show_indicator')[0];
-        let showTools = $('#chart_show_tools')[0];
-        let selectTheme = $('#chart_toolbar_theme')[0];
-
-        let dropDownSettings = $('#chart_dropdown_settings');
-
-        dropDownSettings.css('display', "none");
-        $("#chart_language_setting_div").css('display', "none");
-
-        let periodsVertNW = periodsVert[0].offsetWidth;
-        let periodsHorzNW = periodsVertNW + periodsHorz.offsetWidth;
-        let showIndicNW = periodsHorzNW + showIndic.offsetWidth + 4;
-        let showToolsNW = showIndicNW + showTools.offsetWidth + 4;
-        let selectThemeNW = showToolsNW + selectTheme.offsetWidth;
-        let dropDownSettingsW = dropDownSettings.find(".chart_dropdown_t")[0].offsetWidth + 150;
-        periodsVertNW += dropDownSettingsW;
-        periodsHorzNW += dropDownSettingsW;
-        showIndicNW += dropDownSettingsW;
-        showToolsNW += dropDownSettingsW;
-        selectThemeNW += dropDownSettingsW;
-
-        // if (chartWidth < periodsHorzNW) {
-        //     domElemCache.append(periodsHorz);
-        // } else {
-        //     periodsVert.after(periodsHorz);
-        // }
-        if (chartWidth < showIndicNW) {
-            domElemCache.append(showIndic);
-            rowIndic.style.display = "";
-        } else {
-            dropDownSettings.before(showIndic);
-            rowIndic.style.display = "none";
-        }
-        if (chartWidth < showToolsNW) {
-            domElemCache.append(showTools);
-            rowTools.style.display = "";
-        } else {
-            dropDownSettings.before(showTools);
-            rowTools.style.display = "none";
-        }
-        if (chartWidth < selectThemeNW) {
-            domElemCache.append(selectTheme);
-            rowTheme.style.display = "";
-        } else {
-            dropDownSettings.before(selectTheme);
-            rowTheme.style.display = "none";
-        }
-
-
-        // $('#chart_show_indicator').hide();
-        // $('#chart_show_tools').hide();
-        // $('#chart_toolbar_theme').hide();
-
         ChartManager.instance.redraw('All', true);
         Kline.instance.onResize(width, height);
     }

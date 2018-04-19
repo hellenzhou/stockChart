@@ -123,7 +123,7 @@ export default class Kline {
         this.showLanguageSelect = false;
         this.showDrawTool = false;
         this.tradeHeight = 44;
-        
+
         Object.assign(this, option);
 
         if (!Kline.created) {
@@ -138,7 +138,7 @@ export default class Kline {
      * Methods
      *********************************************/
     periodsVertDisplayNone(array) {
-        if (array  && Array.isArray(array) && array.length > 0) {
+        if (array && Array.isArray(array) && array.length > 0) {
             this.periodAreaRanages = array;
             for (let k in this.ranges) {
                 let curPeriod = this.ranges[k];
@@ -398,7 +398,7 @@ export default class Kline {
             $("#chart_toolbar_periods_vert ul a").click(function () {
 
                 Control.switchPeriod($(this).parent().attr('name'));
-                 // modify  add 
+                // modify  add 
                 let pdescribe = $(this).text();
                 if (pdescribe != undefined && typeof (pdescribe) === "string") {
                     $(".chart_str_period").text(pdescribe);
@@ -540,31 +540,31 @@ export default class Kline {
                 ChartManager.instance.redraw('OverlayCanvas', false);
             });
 
-             // 支持移动mobile触摸屏
-             let chart_overlayCanvas = document.getElementById('chart_overlayCanvas');
-             chart_overlayCanvas.ontouchstart = function (e) {
-                 Kline.instance.buttonDown = true;
-                 let r = e.target.getBoundingClientRect();
-                 let x = e.touches[0].clientX - r.left;
-                 let y = e.touches[0].clientY - r.top;
-                 ChartManager.instance.onMouseDown("frame0", x, y);
-             }
- 
-             chart_overlayCanvas.ontouchmove = function (e) {
-                 let r = e.target.getBoundingClientRect();
-                 let x = e.changedTouches[0].clientX - r.left;
-                 let y = e.changedTouches[0].clientY - r.top;
-                 let mgr = ChartManager.instance;
-                 if (Kline.instance.buttonDown === true) {
-                     mgr.onMouseMove("frame0", x, y, true);
-                     mgr.redraw("All", false);
-                 } else {
-                     mgr.onMouseMove("frame0", x, y, false);
-                     mgr.redraw("OverlayCanvas");
-                 }
-             }
+            // 支持移动mobile触摸屏
+            let chart_overlayCanvas = document.getElementById('chart_overlayCanvas');
+            chart_overlayCanvas.ontouchstart = function (e) {
+                Kline.instance.buttonDown = true;
+                let r = e.target.getBoundingClientRect();
+                let x = e.touches[0].clientX - r.left;
+                let y = e.touches[0].clientY - r.top;
+                ChartManager.instance.onMouseDown("frame0", x, y);
+            }
 
-             chart_overlayCanvas.ontouchend = function (e) {
+            chart_overlayCanvas.ontouchmove = function (e) {
+                let r = e.target.getBoundingClientRect();
+                let x = e.changedTouches[0].clientX - r.left;
+                let y = e.changedTouches[0].clientY - r.top;
+                let mgr = ChartManager.instance;
+                if (Kline.instance.buttonDown === true) {
+                    mgr.onMouseMove("frame0", x, y, true);
+                    mgr.redraw("All", false);
+                } else {
+                    mgr.onMouseMove("frame0", x, y, false);
+                    mgr.redraw("OverlayCanvas");
+                }
+            }
+
+            chart_overlayCanvas.ontouchend = function (e) {
                 Kline.instance.buttonDown = false;
                 let r = e.target.getBoundingClientRect();
                 let x = e.changedTouches[0].clientX - r.left;
@@ -583,56 +583,56 @@ export default class Kline {
                 mgr.redraw("OverlayCanvas");
             }
             $("#chart_overlayCanvas")
-            .mousemove(function (e) {
+                .mousemove(function (e) {
 
-                let r = e.target.getBoundingClientRect();
-                let x = e.clientX - r.left;
-                let y = e.clientY - r.top;
-                let mgr = ChartManager.instance;
-                let ratio = Kline.instance.deviceRatio;
-                if (Kline.instance.buttonDown === true) {
-                    mgr.onMouseMove("frame0", x * ratio, y * ratio, true);
-                    mgr.redraw("All", false);
-                } else {
-                    mgr.onMouseMove("frame0", x * ratio, y * ratio, false);
+                    let r = e.target.getBoundingClientRect();
+                    let x = e.clientX - r.left;
+                    let y = e.clientY - r.top;
+                    let mgr = ChartManager.instance;
+                    let ratio = Kline.instance.deviceRatio;
+                    if (Kline.instance.buttonDown === true) {
+                        mgr.onMouseMove("frame0", x * ratio, y * ratio, true);
+                        mgr.redraw("All", false);
+                    } else {
+                        mgr.onMouseMove("frame0", x * ratio, y * ratio, false);
+                        mgr.redraw("OverlayCanvas");
+                    }
+                })
+                .mouseleave(function (e) {
+                    let r = e.target.getBoundingClientRect();
+                    let x = e.clientX - r.left;
+                    let y = e.clientY - r.top;
+                    let mgr = ChartManager.instance;
+                    let ratio = Kline.instance.deviceRatio;
+                    mgr.onMouseLeave("frame0", x * ratio, y * ratio, false);
                     mgr.redraw("OverlayCanvas");
-                }
-            })
-            .mouseleave(function (e) {
-                let r = e.target.getBoundingClientRect();
-                let x = e.clientX - r.left;
-                let y = e.clientY - r.top;
-                let mgr = ChartManager.instance;
-                let ratio = Kline.instance.deviceRatio;
-                mgr.onMouseLeave("frame0", x * ratio, y * ratio, false);
-                mgr.redraw("OverlayCanvas");
-            })
-            .mouseup(function (e) {
-                if (e.which !== 1) {
-                    return;
-                }
-                Kline.instance.buttonDown = false;
-                let r = e.target.getBoundingClientRect();
-                let x = e.clientX - r.left;
-                let y = e.clientY - r.top;
-                let mgr = ChartManager.instance;
-                let ratio = Kline.instance.deviceRatio;
-                mgr.onMouseUp("frame0", x * ratio, y * ratio);
-                mgr.redraw("All");
-            })
-            .mousedown(function (e) {
-                if (e.which !== 1) {
-                    ChartManager.instance.deleteToolObject();
-                    ChartManager.instance.redraw('OverlayCanvas', false);
-                    return;
-                }
-                Kline.instance.buttonDown = true;
-                let r = e.target.getBoundingClientRect();
-                let x = e.clientX - r.left;
-                let y = e.clientY - r.top;
-                let ratio = Kline.instance.deviceRatio;
-                ChartManager.instance.onMouseDown("frame0", x * ratio, y * ratio);
-            });
+                })
+                .mouseup(function (e) {
+                    if (e.which !== 1) {
+                        return;
+                    }
+                    Kline.instance.buttonDown = false;
+                    let r = e.target.getBoundingClientRect();
+                    let x = e.clientX - r.left;
+                    let y = e.clientY - r.top;
+                    let mgr = ChartManager.instance;
+                    let ratio = Kline.instance.deviceRatio;
+                    mgr.onMouseUp("frame0", x * ratio, y * ratio);
+                    mgr.redraw("All");
+                })
+                .mousedown(function (e) {
+                    if (e.which !== 1) {
+                        ChartManager.instance.deleteToolObject();
+                        ChartManager.instance.redraw('OverlayCanvas', false);
+                        return;
+                    }
+                    Kline.instance.buttonDown = true;
+                    let r = e.target.getBoundingClientRect();
+                    let x = e.clientX - r.left;
+                    let y = e.clientY - r.top;
+                    let ratio = Kline.instance.deviceRatio;
+                    ChartManager.instance.onMouseDown("frame0", x * ratio, y * ratio);
+                });
 
             /*
             $("#chart_overlayCanvas")
@@ -682,7 +682,7 @@ export default class Kline {
                     ChartManager.instance.onMouseDown("frame0", x, y);
                 });
            */
-           $("#chart_parameter_settings :input").change(function () {
+            $("#chart_parameter_settings :input").change(function () {
                 let name = $(this).attr("name");
                 let index = 0;
                 let valueArray = [];
@@ -738,6 +738,30 @@ export default class Kline {
 
             $("#kline_container").on('click', '#sizeIcon', function () {
                 Kline.instance.isSized = !Kline.instance.isSized;
+                let chart_container_fullscreen = $('#chart_container_fullscreen');
+                let chart_trade_quotation = $('.chart_trade_quotation');
+                let chart_container = $('.chart_container');
+                let trade_container = $('.trade_container');
+
+                if (Kline.instance.isSized) {
+                    trade_container.css('display', "none");
+                    chart_container.appendTo(chart_container_fullscreen);
+                    Control.onSize(Kline.instance.height, Kline.instance.width);
+                    chart_container_fullscreen.css('display', "block");
+                    chart_trade_quotation.css('display', "none");
+
+                } else {
+                    chart_trade_quotation.css('display', "block");
+                    chart_container = chart_container.detach();
+                    chart_trade_quotation.after(chart_container);
+                    chart_container_fullscreen.css('display', "none");
+                    trade_container.css('display', "block");
+                    Control.onSize(Kline.instance.width, Kline.instance.height);
+                }
+
+                return;
+
+
                 if (Kline.instance.isSized) {
                     $(Kline.instance.element).css({
                         position: 'fixed',
@@ -772,22 +796,22 @@ export default class Kline {
             });
             // modify  add
             $("#chart_main_indicator li")
-            .click(function () {
-                $("#chart_main_indicator a").removeClass('selected');
-                $(this).find('a').addClass("selected");
-                let name = $(this).find('a').attr('name');
-                let tmp = ChartSettings.get();
-                tmp.charts.mIndic = name;
-                ChartSettings.save();
+                .click(function () {
+                    $("#chart_main_indicator a").removeClass('selected');
+                    $(this).find('a').addClass("selected");
+                    let name = $(this).find('a').attr('name');
+                    let tmp = ChartSettings.get();
+                    tmp.charts.mIndic = name;
+                    ChartSettings.save();
 
-                let mgr = ChartManager.instance;
-                if (!mgr.setMainIndicator("frame0.k0", name))
-                    mgr.removeMainIndicator("frame0.k0");
-                mgr.redraw();
+                    let mgr = ChartManager.instance;
+                    if (!mgr.setMainIndicator("frame0.k0", name))
+                        mgr.removeMainIndicator("frame0.k0");
+                    mgr.redraw();
 
-                $("#chart_main_indicator .chart_dropdown_data").removeClass("chart_dropdown-hover");
-                $("#chart_main_indicator .chart_dropdown_t").removeClass("chart_dropdown-hover");
-            });
+                    $("#chart_main_indicator .chart_dropdown_data").removeClass("chart_dropdown-hover");
+                    $("#chart_main_indicator .chart_dropdown_t").removeClass("chart_dropdown-hover");
+                });
 
         })
 

@@ -460,7 +460,7 @@ li {
 .chart_container #chart_updated_time {
     float: right;
     margin: 4px 3px;
-    padding: 3px 6px
+    padding: 3px 10px
 }
 
 
@@ -1042,7 +1042,7 @@ li {
 } */
 
 .symbol-title {
-    font-size: 20px;
+    font-size: 16px;
     font-weight: bold;
     text-align: center;
     height: 24px;
@@ -1053,6 +1053,11 @@ li {
 
 .symbol-title .dark {
     color: #6BF
+}
+
+.symbol-title .white {
+    color: #FFF;
+    text-decoration:none;
 }
 
 .symbol-title .infoDepth {
@@ -1165,7 +1170,7 @@ li {
 }
 
 .chart_trade_quotation {
-    height: 80px;
+    height: 76px;
     background-color: #0a0a0a;
     position: relative;
 }
@@ -1197,7 +1202,7 @@ li {
 
 #chart_trade_quotation_content li:nth-of-type(2) {
     left: 26px;
-    top: 36px;
+    top: 49px;
     color: whitesmoke;
 }
 

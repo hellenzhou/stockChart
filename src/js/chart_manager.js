@@ -1,16 +1,17 @@
-import {Control} from './control'
-import {Chart} from './chart'
+import { Control } from './control'
+import { Chart } from './chart'
 import * as indicators from './indicators'
 import * as ranges from './ranges'
 import * as templates from './templates'
 import * as data_sources from './data_sources'
-import {ChartSettings} from './chart_settings'
+import { ChartSettings } from './chart_settings'
 import * as data_providers from './data_providers'
 import * as themes from './themes'
 import * as plotters from './plotters'
 import * as ctools from './ctools'
 import * as areas from './areas'
-import {Util} from './util'
+import { Util } from './util'
+import Kline from './kline';
 
 
 export class ChartManager {
@@ -65,12 +66,18 @@ export class ChartManager {
         this._overlayCanvas = null;
         this._mainContext = null;
         this._overlayContext = null;
+        this._x = 0;
+        this._y = 0;
 
         if (!ChartManager.created) {
             ChartManager.instance = this;
             ChartManager.created = true;
         }
         return ChartManager.instance;
+    }
+    setxy(x, y) {
+        this._x = x;
+        this._y = y;
     }
 
     redraw(layer, refresh) {
@@ -81,10 +88,21 @@ export class ChartManager {
             if (refresh) {
                 this.getFrame("frame0").setChanged(true);
             }
-            this.layout(this._mainContext, "frame0", 0, 0, this._mainCanvas.width, this._mainCanvas.height);
+
+            //modify 
+            if (this._x === 0) {
+                this.layout(this._mainContext, "frame0", 0, 0, this._mainCanvas.width, this._mainCanvas.height);
+            } else {
+                this.layout(this._mainContext, "frame0", -368 *3, (-207 ) * 3,
+                    this._mainCanvas.height + ( -368 *3), this._mainCanvas.width + (-207 ) * 3);
+            }
+
+
             this.drawMain("frame0", this._mainContext);
         }
         if (layer === "All" || layer === "OverlayCanvas") {
+            //modify 
+           
             this._overlayContext.clearRect(0, 0, this._overlayCanvas.width, this._overlayCanvas.height);
             this.drawOverlay("frame0", this._overlayContext);
         }
@@ -449,7 +467,7 @@ export class ChartManager {
     }
 
     setFrameMousePos(name, px, py) {
-        this._frameMousePos[name] = {x: px, y: py};
+        this._frameMousePos[name] = { x: px, y: py };
     }
 
     drawArea(context, area, plotterNames) {
@@ -974,7 +992,7 @@ export class ChartManager {
         if (!notLoadSettings) {
             indic.setParameters(ChartSettings.get().indics[indicName]);
         }
-        return {"indic": indic, "range": range};
+        return { "indic": indic, "range": range };
     }
 
     setMainIndicator(dsName, indicName) {
