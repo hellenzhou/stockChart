@@ -545,6 +545,7 @@ export default class Kline {
             chart_overlayCanvas.ontouchstart = function (e) {
                 Kline.instance.buttonDown = true;
                 let r = e.target.getBoundingClientRect();
+                debugger
                 let x = e.touches[0].clientX - r.left;
                 let y = e.touches[0].clientY - r.top;
                 ChartManager.instance.onMouseDown("frame0", x, y);

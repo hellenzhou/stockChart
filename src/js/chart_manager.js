@@ -93,8 +93,8 @@ export class ChartManager {
             if (this._x === 0) {
                 this.layout(this._mainContext, "frame0", 0, 0, this._mainCanvas.width, this._mainCanvas.height);
             } else {
-                this.layout(this._mainContext, "frame0", -368 *3, (-207 ) * 3,
-                    this._mainCanvas.height + ( -368 *3), this._mainCanvas.width + (-207 ) * 3);
+                this.layout(this._mainContext, "frame0", this._x, this._y,
+                    this._mainCanvas.height + this._x, this._mainCanvas.width + this._y);
             }
 
 
@@ -102,8 +102,12 @@ export class ChartManager {
         }
         if (layer === "All" || layer === "OverlayCanvas") {
             //modify 
-           
+            if (this._x === 0) {
             this._overlayContext.clearRect(0, 0, this._overlayCanvas.width, this._overlayCanvas.height);
+            } else {
+                  this._overlayContext.clearRect(this._x,  this._y, this._overlayCanvas.height + this._x, this._overlayCanvas.width +  this._y);
+            }
+            
             this.drawOverlay("frame0", this._overlayContext);
         }
     }

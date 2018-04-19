@@ -1434,7 +1434,7 @@ function () {
         if (this._x === 0) {
           this.layout(this._mainContext, "frame0", 0, 0, this._mainCanvas.width, this._mainCanvas.height);
         } else {
-          this.layout(this._mainContext, "frame0", -368 * 3, -207 * 3, this._mainCanvas.height + -368 * 3, this._mainCanvas.width + -207 * 3);
+          this.layout(this._mainContext, "frame0", this._x, this._y, this._mainCanvas.height + this._x, this._mainCanvas.width + this._y);
         }
 
         this.drawMain("frame0", this._mainContext);
@@ -1442,7 +1442,11 @@ function () {
 
       if (layer === "All" || layer === "OverlayCanvas") {
         //modify 
-        this._overlayContext.clearRect(0, 0, this._overlayCanvas.width, this._overlayCanvas.height);
+        if (this._x === 0) {
+          this._overlayContext.clearRect(0, 0, this._overlayCanvas.width, this._overlayCanvas.height);
+        } else {
+          this._overlayContext.clearRect(this._x, this._y, this._overlayCanvas.height + this._x, this._overlayCanvas.width + this._y);
+        }
 
         this.drawOverlay("frame0", this._overlayContext);
       }
@@ -4467,6 +4471,7 @@ function () {
         chart_overlayCanvas.ontouchstart = function (e) {
           Kline.instance.buttonDown = true;
           var r = e.target.getBoundingClientRect();
+          debugger;
           var x = e.touches[0].clientX - r.left;
           var y = e.touches[0].clientY - r.top;
 
@@ -9707,8 +9712,7 @@ function () {
     key: "onSize",
     value: function onSize(w, h) {
       var width = w || window.innerWidth;
-      var chartWidth = width; //Kline.instance.showTrade ? (width - Kline.instance.tradeWidth) : width;
-      //modify 右侧的行情面板
+      var chartWidth = width; //modify 右侧的行情面板
 
       var height = h || window.innerHeight;
       var remainHeight = height; //modify
@@ -9934,9 +9938,9 @@ function () {
         _tabBar.hide();
 
         var _canvasGroupRect = {};
-        _canvasGroupRect.x = 0;
+        _canvasGroupRect.x = topSidebar;
         _canvasGroupRect.y = 0;
-        _canvasGroupRect.w = 414;
+        _canvasGroupRect.w = portraitRemainWidth;
         _canvasGroupRect.h = portraitHeight;
 
         _canvasGroup.css({
@@ -9967,22 +9971,24 @@ function () {
         _mainCanvas.style.width = _canvasGroupRect.w + 'px';
         _mainCanvas.style.height = _canvasGroupRect.h + "px";
         _overlayCanvas.style.width = _canvasGroupRect.w + 'px';
-        _overlayCanvas.style.height = _canvasGroupRect.h + 'px'; // mainCanvas.style.overflow = 'scroll';
-
-        var overlayerContext = _overlayCanvas.getContext("2d");
-
-        _context.setTransform(1, 0, 0, 1, 0, 0); //  //   overlayerContext.setTransform(1,0,0,1,0,0);
-
-
+        _overlayCanvas.style.height = _canvasGroupRect.h + 'px';
         var centerX = portraitWidth / 2 * _ratio;
         var centerY = portraitHeight / 2 * _ratio;
-        debugger;
+
+        _context.setTransform(1, 0, 0, 1, 0, 0);
 
         _context.translate(centerX, centerY);
 
         _context.rotate(90 * Math.PI / 180);
 
-        _chart_manager.ChartManager.instance.setxy(-centerY, -centerX);
+        var overlayerContext = _overlayCanvas.getContext("2d");
+
+        overlayerContext.clearRect(0, 0, 414, 736);
+        overlayerContext.setTransform(1, 0, 0, 1, 0, 0);
+        overlayerContext.translate(centerX, centerY);
+        overlayerContext.rotate(90 * Math.PI / 180);
+
+        _chart_manager.ChartManager.instance.setxy(-centerY, -centerX + topSidebar * 2 * _ratio);
       }
 
       _chart_manager.ChartManager.instance.redraw('All', true);

@@ -625,7 +625,6 @@ export class Control {
     static onSize(w, h) {
         let width = w || window.innerWidth;
         let chartWidth = width;
-        //Kline.instance.showTrade ? (width - Kline.instance.tradeWidth) : width;
         //modify 右侧的行情面板
         let height = h || window.innerHeight;
         let remainHeight = height;
@@ -858,9 +857,9 @@ export class Control {
 
 
             let canvasGroupRect = {};
-            canvasGroupRect.x = 0;
+            canvasGroupRect.x = topSidebar;
             canvasGroupRect.y = 0;
-            canvasGroupRect.w = 414;
+            canvasGroupRect.w = portraitRemainWidth;
             canvasGroupRect.h = portraitHeight;
             canvasGroup.css({
                 left: canvasGroupRect.x + 'px',
@@ -898,21 +897,25 @@ export class Control {
 
             overlayCanvas.style.width = canvasGroupRect.w + 'px';
             overlayCanvas.style.height = canvasGroupRect.h + 'px';
-            // mainCanvas.style.overflow = 'scroll';
+    
 
-            let overlayerContext = overlayCanvas.getContext("2d");
-
-            context.setTransform(1, 0, 0, 1, 0, 0);
-            //  //   overlayerContext.setTransform(1,0,0,1,0,0);
-
+                
+           
             let centerX = portraitWidth / 2 * ratio;
             let centerY = portraitHeight / 2 * ratio;
-debugger
-            context.translate(centerX, centerY);
-            context.rotate(90 * Math.PI / 180);
-        
- 
-           ChartManager.instance.setxy(-centerY,-centerX );
+
+            context.setTransform(1, 0, 0, 1, 0, 0);
+            context.translate(centerX , centerY);
+            context.rotate(90 * Math.PI / 180); 
+           
+
+            let overlayerContext = overlayCanvas.getContext("2d"); 
+            overlayerContext.clearRect(0, 0, 414, 736);
+            overlayerContext.setTransform(1,0,0,1,0,0);
+            overlayerContext.translate(centerX , centerY);
+            overlayerContext.rotate(90 * Math.PI / 180); 
+
+           ChartManager.instance.setxy(-centerY ,-centerX + topSidebar *2 *ratio );
         }
         ChartManager.instance.redraw('All', true);
         Kline.instance.onResize(width, height);
