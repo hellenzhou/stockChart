@@ -339,7 +339,7 @@ export class Control {
             Kline.instance.klineTimer = setTimeout(Control.klineReqOnTwoSecondThread, intervalTime);
         }
 
-        ChartManager.instance.redraw('MainCanvas', false);
+        ChartManager.instance.redraw('MainCanvas', );
     }
 
     static klineReqOnTwoSecondThread() {
@@ -857,9 +857,9 @@ export class Control {
 
 
             let canvasGroupRect = {};
-            canvasGroupRect.x = topSidebar;
+            canvasGroupRect.x = 0;
             canvasGroupRect.y = 0;
-            canvasGroupRect.w = portraitRemainWidth;
+            canvasGroupRect.w = portraitWidth;
             canvasGroupRect.h = portraitHeight;
             canvasGroup.css({
                 left: canvasGroupRect.x + 'px',
@@ -881,10 +881,8 @@ export class Control {
                 context.oBackingStorePixelRatio ||
                 context.backingStorePixelRatio || 1;
 
-
             let ratio = devicePixelRatio / backingStoreRatio;
             Kline.instance.deviceRatio = ratio;
-
 
             mainCanvas.width = canvasGroupRect.w * ratio;
             mainCanvas.height = canvasGroupRect.h * ratio;
@@ -897,10 +895,7 @@ export class Control {
 
             overlayCanvas.style.width = canvasGroupRect.w + 'px';
             overlayCanvas.style.height = canvasGroupRect.h + 'px';
-    
-
-                
-           
+  
             let centerX = portraitWidth / 2 * ratio;
             let centerY = portraitHeight / 2 * ratio;
 
@@ -908,14 +903,15 @@ export class Control {
             context.translate(centerX , centerY);
             context.rotate(90 * Math.PI / 180); 
            
-
             let overlayerContext = overlayCanvas.getContext("2d"); 
-            overlayerContext.clearRect(0, 0, 414, 736);
+            // overlayerContext.clearRect(0, 0, 414, 736);
             overlayerContext.setTransform(1,0,0,1,0,0);
             overlayerContext.translate(centerX , centerY);
             overlayerContext.rotate(90 * Math.PI / 180); 
 
-           ChartManager.instance.setxy(-centerY ,-centerX + topSidebar *2 *ratio );
+        //    ChartManager.instance.setxy(-centerY ,-centerX + topSidebar *2 *ratio );
+
+        ChartManager.instance.setxy(-centerY ,-centerX );
         }
         ChartManager.instance.redraw('All', true);
         Kline.instance.onResize(width, height);

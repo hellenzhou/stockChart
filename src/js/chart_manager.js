@@ -75,6 +75,11 @@ export class ChartManager {
         }
         return ChartManager.instance;
     }
+
+    getx() {
+        return this._x;
+    }
+
     setxy(x, y) {
         this._x = x;
         this._y = y;
@@ -103,11 +108,15 @@ export class ChartManager {
         if (layer === "All" || layer === "OverlayCanvas") {
             //modify 
             if (this._x === 0) {
-            this._overlayContext.clearRect(0, 0, this._overlayCanvas.width, this._overlayCanvas.height);
+               
+                this._overlayContext.clearRect(0, 0, this._overlayCanvas.width, this._overlayCanvas.height);
             } else {
-                  this._overlayContext.clearRect(this._x,  this._y, this._overlayCanvas.height + this._x, this._overlayCanvas.width +  this._y);
+                
+           
+                this._overlayContext.clearRect( this._x, this._y , this._overlayCanvas.height, this._overlayCanvas.width);
             }
-            
+
+      
             this.drawOverlay("frame0", this._overlayContext);
         }
     }
@@ -551,6 +560,8 @@ export class ChartManager {
                     area.drawGrid(context);
                 }
         }
+
+       
         for (let n in this._areas) {
             let area = this._areas[n];
             if (Util.isInstance(area, areas.ChartAreaGroup) === false)

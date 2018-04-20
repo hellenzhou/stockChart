@@ -1413,6 +1413,11 @@ function () {
   }
 
   _createClass(ChartManager, [{
+    key: "getx",
+    value: function getx() {
+      return this._x;
+    }
+  }, {
     key: "setxy",
     value: function setxy(x, y) {
       this._x = x;
@@ -1445,7 +1450,7 @@ function () {
         if (this._x === 0) {
           this._overlayContext.clearRect(0, 0, this._overlayCanvas.width, this._overlayCanvas.height);
         } else {
-          this._overlayContext.clearRect(this._x, this._y, this._overlayCanvas.height + this._x, this._overlayCanvas.width + this._y);
+          this._overlayContext.clearRect(this._x, this._y, this._overlayCanvas.height, this._overlayCanvas.width);
         }
 
         this.drawOverlay("frame0", this._overlayContext);
@@ -4027,6 +4032,7 @@ function () {
     value: function draw() {
       Kline.trade = new _kline_trade.KlineTrade();
       Kline.chartMgr = new _chart_manager.ChartManager();
+      debugger;
 
       var view = _jquery.default.parseHTML(_tpl.default);
 
@@ -4471,9 +4477,20 @@ function () {
         chart_overlayCanvas.ontouchstart = function (e) {
           Kline.instance.buttonDown = true;
           var r = e.target.getBoundingClientRect();
-          debugger;
           var x = e.touches[0].clientX - r.left;
           var y = e.touches[0].clientY - r.top;
+
+          if (_chart_manager.ChartManager.instance.getx() !== 0) {
+            // x'=xcosθ-ysinθ
+            // y'=xsinθ+ycosθ 
+            // 翻转回去 -90度
+            var realX = y - 768 / 2;
+            var realY = -x + 414 / 2;
+            x = realX;
+            y = realY;
+          }
+
+          console.log('ontouchstart x:' + x, 'y:' + y);
 
           _chart_manager.ChartManager.instance.onMouseDown("frame0", x, y);
         };
@@ -4483,6 +4500,13 @@ function () {
           var x = e.changedTouches[0].clientX - r.left;
           var y = e.changedTouches[0].clientY - r.top;
           var mgr = _chart_manager.ChartManager.instance;
+
+          if (_chart_manager.ChartManager.instance.getx() !== 0) {
+            var realX = y - 768 / 2;
+            var realY = -x + 414 / 2;
+            x = realX;
+            y = realY;
+          }
 
           if (Kline.instance.buttonDown === true) {
             mgr.onMouseMove("frame0", x, y, true);
@@ -4499,6 +4523,15 @@ function () {
           var x = e.changedTouches[0].clientX - r.left;
           var y = e.changedTouches[0].clientY - r.top;
           var mgr = _chart_manager.ChartManager.instance;
+
+          if (_chart_manager.ChartManager.instance.getx() !== 0) {
+            var realX = y - 768 / 2;
+            var realY = -x + 414 / 2;
+            x = realX;
+            y = realY;
+          }
+
+          console.log('ontouchend x:' + x, 'y:' + y);
           mgr.onMouseUp("frame0", x, y);
           mgr.redraw("All");
         };
@@ -4508,6 +4541,14 @@ function () {
           var x = e.clientX - r.left;
           var y = e.clientY - r.top;
           var mgr = _chart_manager.ChartManager.instance;
+
+          if (_chart_manager.ChartManager.instance.getx() !== 0) {
+            var realX = y - 768 / 2;
+            var realY = -x + 414 / 2;
+            x = realX;
+            y = realY;
+          }
+
           mgr.onMouseLeave("frame0", x, y, false);
           mgr.redraw("OverlayCanvas");
         };
@@ -4519,6 +4560,13 @@ function () {
           var mgr = _chart_manager.ChartManager.instance;
           var ratio = Kline.instance.deviceRatio;
 
+          if (_chart_manager.ChartManager.instance.getx() !== 0) {
+            var realX = y - 768 / 2;
+            var realY = -x + 414 / 2;
+            x = realX;
+            y = realY;
+          }
+
           if (Kline.instance.buttonDown === true) {
             mgr.onMouseMove("frame0", x * ratio, y * ratio, true);
             mgr.redraw("All", false);
@@ -4526,14 +4574,25 @@ function () {
             mgr.onMouseMove("frame0", x * ratio, y * ratio, false);
             mgr.redraw("OverlayCanvas");
           }
+
+          console.log('mousemove x:' + x, 'y:' + y);
         }).mouseleave(function (e) {
           var r = e.target.getBoundingClientRect();
           var x = e.clientX - r.left;
           var y = e.clientY - r.top;
           var mgr = _chart_manager.ChartManager.instance;
           var ratio = Kline.instance.deviceRatio;
+
+          if (_chart_manager.ChartManager.instance.getx() !== 0) {
+            var realX = y - 768 / 2;
+            var realY = -x + 414 / 2;
+            x = realX;
+            y = realY;
+          }
+
           mgr.onMouseLeave("frame0", x * ratio, y * ratio, false);
           mgr.redraw("OverlayCanvas");
+          console.log('mouseleave x:' + x, 'y:' + y);
         }).mouseup(function (e) {
           if (e.which !== 1) {
             return;
@@ -4543,10 +4602,19 @@ function () {
           var r = e.target.getBoundingClientRect();
           var x = e.clientX - r.left;
           var y = e.clientY - r.top;
+
+          if (_chart_manager.ChartManager.instance.getx() !== 0) {
+            var realX = y - 768 / 2;
+            var realY = -x + 414 / 2;
+            x = realX;
+            y = realY;
+          }
+
           var mgr = _chart_manager.ChartManager.instance;
           var ratio = Kline.instance.deviceRatio;
           mgr.onMouseUp("frame0", x * ratio, y * ratio);
           mgr.redraw("All");
+          console.log('mouseup x:' + x, 'y:' + y);
         }).mousedown(function (e) {
           if (e.which !== 1) {
             _chart_manager.ChartManager.instance.deleteToolObject();
@@ -4562,7 +4630,16 @@ function () {
           var y = e.clientY - r.top;
           var ratio = Kline.instance.deviceRatio;
 
+          if (_chart_manager.ChartManager.instance.getx() !== 0) {
+            var realX = y - 768 / 2;
+            var realY = -x + 414 / 2;
+            x = realX;
+            y = realY;
+          }
+
           _chart_manager.ChartManager.instance.onMouseDown("frame0", x * ratio, y * ratio);
+
+          console.log('mousedown x:' + x, 'y:' + y);
         });
         /*
         $("#chart_overlayCanvas")
@@ -9391,7 +9468,7 @@ function () {
         _kline.default.instance.klineTimer = setTimeout(Control.klineReqOnTwoSecondThread, intervalTime);
       }
 
-      _chart_manager.ChartManager.instance.redraw('MainCanvas', false);
+      _chart_manager.ChartManager.instance.redraw('MainCanvas');
     }
   }, {
     key: "klineReqOnTwoSecondThread",
@@ -9938,9 +10015,9 @@ function () {
         _tabBar.hide();
 
         var _canvasGroupRect = {};
-        _canvasGroupRect.x = topSidebar;
+        _canvasGroupRect.x = 0;
         _canvasGroupRect.y = 0;
-        _canvasGroupRect.w = portraitRemainWidth;
+        _canvasGroupRect.w = portraitWidth;
         _canvasGroupRect.h = portraitHeight;
 
         _canvasGroup.css({
@@ -9981,14 +10058,14 @@ function () {
 
         _context.rotate(90 * Math.PI / 180);
 
-        var overlayerContext = _overlayCanvas.getContext("2d");
+        var overlayerContext = _overlayCanvas.getContext("2d"); // overlayerContext.clearRect(0, 0, 414, 736);
 
-        overlayerContext.clearRect(0, 0, 414, 736);
+
         overlayerContext.setTransform(1, 0, 0, 1, 0, 0);
         overlayerContext.translate(centerX, centerY);
-        overlayerContext.rotate(90 * Math.PI / 180);
+        overlayerContext.rotate(90 * Math.PI / 180); //    ChartManager.instance.setxy(-centerY ,-centerX + topSidebar *2 *ratio );
 
-        _chart_manager.ChartManager.instance.setxy(-centerY, -centerX + topSidebar * 2 * _ratio);
+        _chart_manager.ChartManager.instance.setxy(-centerY, -centerX);
       }
 
       _chart_manager.ChartManager.instance.redraw('All', true);

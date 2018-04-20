@@ -154,6 +154,7 @@ export default class Kline {
         Kline.trade = new KlineTrade();
         Kline.chartMgr = new ChartManager();
 
+    debugger
         let view = $.parseHTML(tpl);
         for (let k in this.ranges) {
             let res = $(view).find('[name="' + this.ranges[k] + '"]');
@@ -545,9 +546,20 @@ export default class Kline {
             chart_overlayCanvas.ontouchstart = function (e) {
                 Kline.instance.buttonDown = true;
                 let r = e.target.getBoundingClientRect();
-                debugger
                 let x = e.touches[0].clientX - r.left;
                 let y = e.touches[0].clientY - r.top;
+
+                if (ChartManager.instance.getx() !== 0) {
+                    // x'=xcosθ-ysinθ
+                    // y'=xsinθ+ycosθ 
+                    // 翻转回去 -90度
+                     let realX = y - 768 / 2;
+                    let realY = -x + 414 / 2;
+                    x = realX;
+                    y = realY;
+                }
+
+                console.log('ontouchstart x:' + x, 'y:' + y);
                 ChartManager.instance.onMouseDown("frame0", x, y);
             }
 
@@ -556,6 +568,13 @@ export default class Kline {
                 let x = e.changedTouches[0].clientX - r.left;
                 let y = e.changedTouches[0].clientY - r.top;
                 let mgr = ChartManager.instance;
+                if (ChartManager.instance.getx() !== 0) {
+                    let realX = y - 768 / 2;
+                    let realY = -x + 414 / 2;
+                    x = realX;
+                    y = realY;
+                }
+
                 if (Kline.instance.buttonDown === true) {
                     mgr.onMouseMove("frame0", x, y, true);
                     mgr.redraw("All", false);
@@ -571,6 +590,14 @@ export default class Kline {
                 let x = e.changedTouches[0].clientX - r.left;
                 let y = e.changedTouches[0].clientY - r.top;
                 let mgr = ChartManager.instance;
+                if (ChartManager.instance.getx() !== 0) {
+                    let realX = y - 768 / 2;
+                    let realY = -x + 414 / 2;
+                    x = realX;
+                    y = realY;
+                }
+
+                console.log('ontouchend x:' + x, 'y:' + y);
                 mgr.onMouseUp("frame0", x, y);
                 mgr.redraw("All");
             }
@@ -580,6 +607,12 @@ export default class Kline {
                 let x = e.clientX - r.left;
                 let y = e.clientY - r.top;
                 let mgr = ChartManager.instance;
+                if (ChartManager.instance.getx() !== 0) {
+                    let realX = y - 768 / 2;
+                    let realY = -x + 414 / 2;
+                    x = realX;
+                    y = realY;
+                }
                 mgr.onMouseLeave("frame0", x, y, false);
                 mgr.redraw("OverlayCanvas");
             }
@@ -591,6 +624,13 @@ export default class Kline {
                     let y = e.clientY - r.top;
                     let mgr = ChartManager.instance;
                     let ratio = Kline.instance.deviceRatio;
+                    if (ChartManager.instance.getx() !== 0) {
+                        let realX = y - 768 / 2;
+                        let realY = -x + 414 / 2;
+                        x = realX;
+                        y = realY;
+                    }
+
                     if (Kline.instance.buttonDown === true) {
                         mgr.onMouseMove("frame0", x * ratio, y * ratio, true);
                         mgr.redraw("All", false);
@@ -598,6 +638,9 @@ export default class Kline {
                         mgr.onMouseMove("frame0", x * ratio, y * ratio, false);
                         mgr.redraw("OverlayCanvas");
                     }
+
+                    console.log('mousemove x:' + x, 'y:' + y);
+
                 })
                 .mouseleave(function (e) {
                     let r = e.target.getBoundingClientRect();
@@ -605,8 +648,15 @@ export default class Kline {
                     let y = e.clientY - r.top;
                     let mgr = ChartManager.instance;
                     let ratio = Kline.instance.deviceRatio;
+                    if (ChartManager.instance.getx() !== 0) {
+                        let realX = y - 768 / 2;
+                        let realY = -x + 414 / 2;
+                        x = realX;
+                        y = realY;
+                    }
                     mgr.onMouseLeave("frame0", x * ratio, y * ratio, false);
                     mgr.redraw("OverlayCanvas");
+                    console.log('mouseleave x:' + x, 'y:' + y);
                 })
                 .mouseup(function (e) {
                     if (e.which !== 1) {
@@ -616,10 +666,17 @@ export default class Kline {
                     let r = e.target.getBoundingClientRect();
                     let x = e.clientX - r.left;
                     let y = e.clientY - r.top;
+                    if (ChartManager.instance.getx() !== 0) {
+                        let realX = y - 768 / 2;
+                        let realY = -x + 414 / 2;
+                        x = realX;
+                        y = realY;
+                    }
                     let mgr = ChartManager.instance;
                     let ratio = Kline.instance.deviceRatio;
                     mgr.onMouseUp("frame0", x * ratio, y * ratio);
                     mgr.redraw("All");
+                    console.log('mouseup x:' + x, 'y:' + y);
                 })
                 .mousedown(function (e) {
                     if (e.which !== 1) {
@@ -627,12 +684,21 @@ export default class Kline {
                         ChartManager.instance.redraw('OverlayCanvas', false);
                         return;
                     }
+
                     Kline.instance.buttonDown = true;
                     let r = e.target.getBoundingClientRect();
                     let x = e.clientX - r.left;
                     let y = e.clientY - r.top;
                     let ratio = Kline.instance.deviceRatio;
+                    if (ChartManager.instance.getx() !== 0) {
+                        let realX = y - 768 / 2;
+                        let realY = -x + 414 / 2;
+                        x = realX;
+                        y = realY;
+                    }
+
                     ChartManager.instance.onMouseDown("frame0", x * ratio, y * ratio);
+                    console.log('mousedown x:' + x, 'y:' + y);
                 });
 
             /*
