@@ -108,15 +108,15 @@ export class ChartManager {
         if (layer === "All" || layer === "OverlayCanvas") {
             //modify 
             if (this._x === 0) {
-               
+
                 this._overlayContext.clearRect(0, 0, this._overlayCanvas.width, this._overlayCanvas.height);
             } else {
-                
-           
-                this._overlayContext.clearRect( this._x, this._y , this._overlayCanvas.height, this._overlayCanvas.width);
+
+
+                this._overlayContext.clearRect(this._x, this._y, this._overlayCanvas.height, this._overlayCanvas.width);
             }
 
-      
+
             this.drawOverlay("frame0", this._overlayContext);
         }
     }
@@ -152,6 +152,7 @@ export class ChartManager {
     }
 
     init() {
+        debugger
         delete this._ranges['frame0.k0.indic1'];
         delete this._ranges['frame0.k0.indic1Range'];
         delete this._areas['frame0.k0.indic1'];
@@ -371,7 +372,8 @@ export class ChartManager {
     }
 
     getDataSource(name) {
-        return this._dataSources[name];
+        let ds = this._dataSources[name];
+        return ds;
     }
 
     setDataSource(name, ds, forceRefresh) {
@@ -382,7 +384,8 @@ export class ChartManager {
     }
 
     getCachedDataSource(name) {
-        return this._dataSourceCache[name];
+        let cds = this._dataSourceCache[name];
+        return cds
     }
 
     setCachedDataSource(name, ds) {
@@ -402,7 +405,8 @@ export class ChartManager {
     }
 
     getFrame(name) {
-        return this._frames[name];
+        let f = this._frames[name];
+        return f;
     }
 
     setFrame(name, frame) {
@@ -426,7 +430,8 @@ export class ChartManager {
     }
 
     getTimeline(name) {
-        return this._timelines[name];
+        let tl = this._timelines[name];
+        return tl;
     }
 
     setTimeline(name, timeline) {
@@ -438,7 +443,8 @@ export class ChartManager {
     }
 
     getRange(name) {
-        return this._ranges[name];
+        let rg = this._ranges[name];
+        return  rg;
     }
 
     setRange(name, range) {
@@ -462,7 +468,8 @@ export class ChartManager {
     }
 
     getTheme(name) {
-        return this._themes[name];
+        let th = this._themes[name];
+        return  th;
     }
 
     setTheme(name, theme) {
@@ -561,7 +568,7 @@ export class ChartManager {
                 }
         }
 
-       
+
         for (let n in this._areas) {
             let area = this._areas[n];
             if (Util.isInstance(area, areas.ChartAreaGroup) === false)

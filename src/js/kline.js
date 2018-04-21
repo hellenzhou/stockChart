@@ -154,7 +154,6 @@ export default class Kline {
         Kline.trade = new KlineTrade();
         Kline.chartMgr = new ChartManager();
 
-    debugger
         let view = $.parseHTML(tpl);
         for (let k in this.ranges) {
             let res = $(view).find('[name="' + this.ranges[k] + '"]');
@@ -172,7 +171,7 @@ export default class Kline {
         if (!this.disableFirebase) {
             fire();
         }
-
+        debugger
         this.registerMouseEvent();
         ChartManager.instance.bindCanvas("main", document.getElementById("chart_mainCanvas"));
         ChartManager.instance.bindCanvas("overlay", document.getElementById("chart_overlayCanvas"));

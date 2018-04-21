@@ -72,6 +72,8 @@ export class Range extends NamedObject {
     getSelectedPosition() {
         if (this._selectedPosition >= 0) {
             return this._selectedPosition;
+        }  else  if (this._selectedPosition + 414 *3 > 0){
+            return this._selectedPosition ;
         }
         if (this._selectedValue > -Number.MAX_VALUE) {
             return this.toY(this._selectedValue);
@@ -140,6 +142,7 @@ export class Range extends NamedObject {
     }
 
     selectAt(y) {
+        debugger
         this._selectedPosition = y;
         this._selectedValue = -Number.MAX_VALUE;
     }

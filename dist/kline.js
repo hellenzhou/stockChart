@@ -1490,6 +1490,7 @@ function () {
   }, {
     key: "init",
     value: function init() {
+      debugger;
       delete this._ranges['frame0.k0.indic1'];
       delete this._ranges['frame0.k0.indic1Range'];
       delete this._areas['frame0.k0.indic1'];
@@ -1771,7 +1772,8 @@ function () {
   }, {
     key: "getDataSource",
     value: function getDataSource(name) {
-      return this._dataSources[name];
+      var ds = this._dataSources[name];
+      return ds;
     }
   }, {
     key: "setDataSource",
@@ -1785,7 +1787,8 @@ function () {
   }, {
     key: "getCachedDataSource",
     value: function getCachedDataSource(name) {
-      return this._dataSourceCache[name];
+      var cds = this._dataSourceCache[name];
+      return cds;
     }
   }, {
     key: "setCachedDataSource",
@@ -1810,7 +1813,8 @@ function () {
   }, {
     key: "getFrame",
     value: function getFrame(name) {
-      return this._frames[name];
+      var f = this._frames[name];
+      return f;
     }
   }, {
     key: "setFrame",
@@ -1840,7 +1844,8 @@ function () {
   }, {
     key: "getTimeline",
     value: function getTimeline(name) {
-      return this._timelines[name];
+      var tl = this._timelines[name];
+      return tl;
     }
   }, {
     key: "setTimeline",
@@ -1855,7 +1860,8 @@ function () {
   }, {
     key: "getRange",
     value: function getRange(name) {
-      return this._ranges[name];
+      var rg = this._ranges[name];
+      return rg;
     }
   }, {
     key: "setRange",
@@ -1885,7 +1891,8 @@ function () {
   }, {
     key: "getTheme",
     value: function getTheme(name) {
-      return this._themes[name];
+      var th = this._themes[name];
+      return th;
     }
   }, {
     key: "setTheme",
@@ -4032,7 +4039,6 @@ function () {
     value: function draw() {
       Kline.trade = new _kline_trade.KlineTrade();
       Kline.chartMgr = new _chart_manager.ChartManager();
-      debugger;
 
       var view = _jquery.default.parseHTML(_tpl.default);
 
@@ -4054,6 +4060,7 @@ function () {
         (0, _firebase.default)();
       }
 
+      debugger;
       this.registerMouseEvent();
 
       _chart_manager.ChartManager.instance.bindCanvas("main", document.getElementById("chart_mainCanvas"));
@@ -14112,7 +14119,7 @@ function (_Plotter9) {
       Plotter.drawLine(context, x, area.getTop() - 1, x, area.getBottom());
       var pos = range.getSelectedPosition();
 
-      if (pos >= 0) {
+      if (pos !== -1 && pos + 414 * 3 >= 0) {
         Plotter.drawLine(context, area.getLeft(), pos, area.getRight(), pos);
       }
     }
@@ -20541,6 +20548,8 @@ function (_NamedObject) {
     value: function getSelectedPosition() {
       if (this._selectedPosition >= 0) {
         return this._selectedPosition;
+      } else if (this._selectedPosition + 414 * 3 > 0) {
+        return this._selectedPosition;
       }
 
       if (this._selectedValue > -Number.MAX_VALUE) {
@@ -20632,6 +20641,7 @@ function (_NamedObject) {
   }, {
     key: "selectAt",
     value: function selectAt(y) {
+      debugger;
       this._selectedPosition = y;
       this._selectedValue = -Number.MAX_VALUE;
     }
