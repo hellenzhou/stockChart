@@ -652,7 +652,8 @@ export class Control {
             let canvasGroup = $('#chart_canvasGroup');
             let tabBar = $('#chart_tabbar');
             tabBar.show();
-            let toolPanelShown = toolPanel[0].style.display !== 'inline' ? false : true;
+         //   let toolPanelShown = toolPanel[0].style.display !== 'inline' ? false : true;
+         let toolPanelShown = false;
             let tabBarShown = tabBar[0].style.display !== 'block' ? false : true;
             let toolBarRect = {};
             toolBarRect.x = 0;

@@ -3,6 +3,7 @@ import { KlineTrade } from './kline_trade'
 import { ChartManager } from './chart_manager'
 import { ChartSettings } from './chart_settings'
 import { Template } from './templates'
+import { Range } from './ranges'
 import '../css/main.css'
 import tpl from '../view/tpl.html'
 import fire from './firebase'
@@ -171,7 +172,7 @@ export default class Kline {
         if (!this.disableFirebase) {
             fire();
         }
- 
+
         this.registerMouseEvent();
         ChartManager.instance.bindCanvas("main", document.getElementById("chart_mainCanvas"));
         ChartManager.instance.bindCanvas("overlay", document.getElementById("chart_overlayCanvas"));
@@ -552,7 +553,7 @@ export default class Kline {
                     // x'=xcosθ-ysinθ
                     // y'=xsinθ+ycosθ 
                     // 翻转回去 -90度
-                     let realX = y - 768 / 2;
+                    let realX = y - 768 / 2;
                     let realY = -x + 414 / 2;
                     x = realX;
                     y = realY;
@@ -625,7 +626,7 @@ export default class Kline {
                     let ratio = Kline.instance.deviceRatio;
                     if (ChartManager.instance.getx() !== 0) {
                         let realX = y - Kline.instance.width / 2;
-                    let realY = -x + Kline.instance.height / 2;
+                        let realY = -x + Kline.instance.height / 2;
                         x = realX;
                         y = realY;
                     }
@@ -801,7 +802,43 @@ export default class Kline {
                 ChartManager.instance.redraw('All', false);
             });
 
+            $("#kline_container").on('click', '#fullscreen_chart_updated_time', function () {
+                debugger
+                Kline.instance.isSized = !Kline.instance.isSized;
+                let chart_container_fullscreen = $('#chart_container_fullscreen');
+                chart_container_fullscreen.css('display', "none");
+                let chart_trade_quotation = $('.chart_trade_quotation');
+                let chart_container = $('.chart_container');
+                let trade_container = $('.trade_container');
 
+                chart_trade_quotation.css('display', "block");
+                chart_container = chart_container.detach();
+                // chart_trade_quotation.after(chart_container);
+
+                trade_container.css('display', "block");
+                // let mainCanvas = $('#chart_mainCanvas')[0];
+                // let overlayCanvas = $('#chart_overlayCanvas')[0];
+
+                // let context = mainCanvas.getContext("2d");
+
+
+                ChartManager.instance.setxy(0, 0);
+                // context.setTransform(1, 0, 0, 1, 0, 0);
+                // context.translate(0 , 0);
+                // context.rotate(-90 * Math.PI / 180); 
+
+                // let overlayerContext = overlayCanvas.getContext("2d"); 
+                // Range.setLandscapeOffSetY(0);
+                // overlayerContext.setTransform(1,0,0,1,0,0);
+                // overlayerContext.translate(0 , 0);
+                // overlayerContext.rotate(-90 * Math.PI / 180); 
+                debugger
+
+                Range.setLandscapeOffSetY(0);
+                chart_trade_quotation.after(chart_container);
+                Control.onSize(Kline.instance.width, Kline.instance.height);
+
+            });
             $("#kline_container").on('click', '#sizeIcon', function () {
                 Kline.instance.isSized = !Kline.instance.isSized;
                 let chart_container_fullscreen = $('#chart_container_fullscreen');
@@ -815,7 +852,7 @@ export default class Kline {
                     Control.onSize(Kline.instance.height, Kline.instance.width);
                     chart_container_fullscreen.css('display', "block");
                     chart_trade_quotation.css('display', "none");
-
+                    Range.setLandscapeOffSetY(Kline.instance.height * Kline.instance.deviceRatio);
                 } else {
                     chart_trade_quotation.css('display', "block");
                     chart_container = chart_container.detach();
@@ -823,6 +860,7 @@ export default class Kline {
                     chart_container_fullscreen.css('display', "none");
                     trade_container.css('display', "block");
                     Control.onSize(Kline.instance.width, Kline.instance.height);
+                    Range.setLandscapeOffSetY(0);
                 }
 
                 return;
