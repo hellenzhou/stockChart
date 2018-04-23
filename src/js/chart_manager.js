@@ -102,7 +102,6 @@ export class ChartManager {
                     this._mainCanvas.height + this._x, this._mainCanvas.width + this._y);
             }
 
-
             this.drawMain("frame0", this._mainContext);
         }
         if (layer === "All" || layer === "OverlayCanvas") {
@@ -115,7 +114,6 @@ export class ChartManager {
 
                 this._overlayContext.clearRect(this._x, this._y, this._overlayCanvas.height, this._overlayCanvas.width);
             }
-
 
             this.drawOverlay("frame0", this._overlayContext);
         }

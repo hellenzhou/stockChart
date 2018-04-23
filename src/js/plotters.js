@@ -1634,7 +1634,6 @@ export class LastClosePlotter extends Plotter {
 
 }
 
-
 export class SelectionPlotter extends Plotter {
 
     constructor(name) {

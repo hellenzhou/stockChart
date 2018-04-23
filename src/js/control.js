@@ -624,13 +624,14 @@ export class Control {
         //modify 右侧的行情面板
         let height = h || window.innerHeight;
         let remainHeight = height;
+        let container = $(Kline.instance.element);
         //modify
         if (w < h) {
             if (Kline.instance.showTrade && !isNaN(Kline.instance.tradeHeight)) {
                 remainHeight -= Kline.instance.tradeHeight;
             }
 
-            let container = $(Kline.instance.element);
+            
             container.css({
                 width: width + 'px',
                 height: height + 'px'
@@ -834,8 +835,7 @@ export class Control {
         } else {
             let portraitWidth = height;
             let portraitHeight = width;
-            let container = $(Kline.instance.element);
-
+           
             container.css({
                 width: portraitWidth + 'px',
                 height: portraitHeight + 'px'
@@ -1118,7 +1118,6 @@ export class Control {
     }
 
     static socketConnect() {
-
         if (!Kline.instance.stompClient || !Kline.instance.socketConnected) {
             if (Kline.instance.enableSockjs) {
                 let socket = new SockJS(Kline.instance.url);

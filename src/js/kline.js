@@ -590,8 +590,8 @@ export default class Kline {
                 let y = e.changedTouches[0].clientY - r.top;
                 let mgr = ChartManager.instance;
                 if (ChartManager.instance.getx() !== 0) {
-                    let realX = y - 768 / 2;
-                    let realY = -x + 414 / 2;
+                    let realX = y - Kline.instance.width / 2;
+                    let realY = -x + Kline.instance.height / 2;
                     x = realX;
                     y = realY;
                 }
@@ -607,8 +607,8 @@ export default class Kline {
                 let y = e.clientY - r.top;
                 let mgr = ChartManager.instance;
                 if (ChartManager.instance.getx() !== 0) {
-                    let realX = y - 768 / 2;
-                    let realY = -x + 414 / 2;
+                    let realX = y - Kline.instance.width / 2;
+                    let realY = -x + Kline.instance.height / 2;
                     x = realX;
                     y = realY;
                 }
@@ -624,8 +624,8 @@ export default class Kline {
                     let mgr = ChartManager.instance;
                     let ratio = Kline.instance.deviceRatio;
                     if (ChartManager.instance.getx() !== 0) {
-                        let realX = y - 768 / 2;
-                        let realY = -x + 414 / 2;
+                        let realX = y - Kline.instance.width / 2;
+                    let realY = -x + Kline.instance.height / 2;
                         x = realX;
                         y = realY;
                     }
@@ -648,8 +648,8 @@ export default class Kline {
                     let mgr = ChartManager.instance;
                     let ratio = Kline.instance.deviceRatio;
                     if (ChartManager.instance.getx() !== 0) {
-                        let realX = y - 768 / 2;
-                        let realY = -x + 414 / 2;
+                        let realX = y - Kline.instance.width / 2;
+                        let realY = -x + Kline.instance.height / 2;
                         x = realX;
                         y = realY;
                     }
@@ -666,8 +666,8 @@ export default class Kline {
                     let x = e.clientX - r.left;
                     let y = e.clientY - r.top;
                     if (ChartManager.instance.getx() !== 0) {
-                        let realX = y - 768 / 2;
-                        let realY = -x + 414 / 2;
+                        let realX = y - Kline.instance.width / 2;
+                        let realY = -x + Kline.instance.height / 2;
                         x = realX;
                         y = realY;
                     }
@@ -690,8 +690,8 @@ export default class Kline {
                     let y = e.clientY - r.top;
                     let ratio = Kline.instance.deviceRatio;
                     if (ChartManager.instance.getx() !== 0) {
-                        let realX = y - 768 / 2;
-                        let realY = -x + 414 / 2;
+                        let realX = y - Kline.instance.width / 2;
+                        let realY = -x + Kline.instance.height / 2;
                         x = realX;
                         y = realY;
                     }
