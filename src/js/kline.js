@@ -803,7 +803,7 @@ export default class Kline {
             });
 
             $("#kline_container").on('click', '#fullscreen_chart_updated_time', function () {
-                debugger
+        
                 Kline.instance.isSized = !Kline.instance.isSized;
                 let chart_container_fullscreen = $('#chart_container_fullscreen');
                 chart_container_fullscreen.css('display', "none");
@@ -831,8 +831,7 @@ export default class Kline {
                 // Range.setLandscapeOffSetY(0);
                 // overlayerContext.setTransform(1,0,0,1,0,0);
                 // overlayerContext.translate(0 , 0);
-                // overlayerContext.rotate(-90 * Math.PI / 180); 
-                debugger
+                // overlayerContext.rotate(-90 * Math.PI / 180);     
 
                 Range.setLandscapeOffSetY(0);
                 chart_trade_quotation.after(chart_container);
