@@ -171,7 +171,7 @@ export default class Kline {
         if (!this.disableFirebase) {
             fire();
         }
-        debugger
+ 
         this.registerMouseEvent();
         ChartManager.instance.bindCanvas("main", document.getElementById("chart_mainCanvas"));
         ChartManager.instance.bindCanvas("overlay", document.getElementById("chart_overlayCanvas"));

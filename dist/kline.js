@@ -9801,6 +9801,8 @@ function () {
       var height = h || window.innerHeight;
       var remainHeight = height; //modify
 
+      debugger;
+
       if (w < h) {
         if (_kline.default.instance.showTrade && !isNaN(_kline.default.instance.tradeHeight)) {
           remainHeight -= _kline.default.instance.tradeHeight;
@@ -9922,20 +9924,21 @@ function () {
         var chatPeriodToolRanages = []; // 根据时间计算显示个数
 
         var ranges = _kline.default.instance.ranges;
-        var periodShowWidth = chartWidth - mainIndicator.offsetWidth - 4 - periodsVert[0].offsetWidth - sizeIcon.offsetWidth;
+        var periodShowWidth = chartWidth - mainIndicator.offsetWidth - periodsVert[0].offsetWidth - sizeIcon.offsetWidth - 36;
         var totalCount = ranges.length;
         var showCount = totalCount;
         var totalWidth = 0;
 
         for (var i = 0; i < totalCount; i++) {
           var dom = (0, _jquery.default)('#chart_period_' + ranges[i] + '_h');
-          dom.show();
-          totalWidth += dom.width();
+          var dowWidth = dom.width();
+          totalWidth += dowWidth;
 
-          if (totalWidth > periodShowWidth - periodsVert.width()) {
+          if (totalWidth >= periodShowWidth) {
             dom.hide();
             showCount--;
           } else {
+            dom.show();
             chatPeriodToolRanages.push(ranges[i]);
           }
         }

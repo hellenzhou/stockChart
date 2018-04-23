@@ -142,7 +142,6 @@ export class Range extends NamedObject {
     }
 
     selectAt(y) {
-        debugger
         this._selectedPosition = y;
         this._selectedValue = -Number.MAX_VALUE;
     }

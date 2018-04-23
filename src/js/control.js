@@ -244,7 +244,6 @@ export class Control {
     }
 
 
-
     static klineRequestOverStomp() {
     }
 
@@ -318,7 +317,6 @@ export class Control {
         }
 
         chart.setTitle();
-
         Kline.instance.klineData = eval(res.data);
         let updateDataRes = Kline.instance.chartMgr.updateData("frame0.k0", Kline.instance.klineData);
         Kline.instance.requestParam = Control.setHttpRequestParam(Kline.instance.symbol, Kline.instance.range, null, Kline.instance.chartMgr.getDataSource("frame0.k0").getLastDate());
@@ -410,7 +408,6 @@ export class Control {
         }
 
         Kline.instance.depthData = eval(res);
-
         let intervalTime = Kline.instance.depthIntervalTime;
         if (Kline.instance.depthData) {
             KlineTrade.instance.updateDepth(Kline.instance.depthData);
@@ -579,7 +576,6 @@ export class Control {
         }
         Control.chartSwitchLanguage(tmp.language || "zh-cn");
     }
-
 
     static setHttpRequestParam(symbol, range, limit, since) {
         let str = "symbol=" + symbol + "&range=" + range;
@@ -760,19 +756,20 @@ export class Control {
             let chatPeriodToolRanages = [];
             // 根据时间计算显示个数
             let ranges = Kline.instance.ranges;
-            let periodShowWidth = chartWidth - mainIndicator.offsetWidth - 4 - periodsVert[0].offsetWidth - sizeIcon.offsetWidth;
+            let periodShowWidth = chartWidth - mainIndicator.offsetWidth  - periodsVert[0].offsetWidth - sizeIcon.offsetWidth - 38;
             let totalCount = ranges.length;
             let showCount = totalCount;
             let totalWidth = 0;
-
+ 
             for (let i = 0; i < totalCount; i++) {
                 let dom = $('#chart_period_' + ranges[i] + '_h');
-                dom.show();
-                totalWidth += dom.width();
-                if (totalWidth > periodShowWidth - periodsVert.width()) {
+                let dowWidth = dom.width();
+                totalWidth += dowWidth;
+                if (totalWidth >= periodShowWidth) {
                     dom.hide();
                     showCount--;
                 } else {
+                    dom.show();
                     chatPeriodToolRanages.push(ranges[i])
                 }
             }

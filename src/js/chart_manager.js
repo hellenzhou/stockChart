@@ -152,7 +152,6 @@ export class ChartManager {
     }
 
     init() {
-        debugger
         delete this._ranges['frame0.k0.indic1'];
         delete this._ranges['frame0.k0.indic1Range'];
         delete this._areas['frame0.k0.indic1'];
